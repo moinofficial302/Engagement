@@ -817,6 +817,30 @@ body {
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
 
+/* ─── 20b. INSTALL APP BUTTON ─── */
+.install-btn {
+  position: fixed;
+  bottom: 90px; right: 20px;
+  z-index: 500;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, var(--gold), #b8934a);
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 30px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  cursor: pointer;
+  animation: fadeInUp 0.5s ease;
+}
+.install-btn.show { display: flex; }
+.install-btn:active { transform: scale(0.96); }
+
 /* ─── 21. CONGRATS OVERLAY ─── */
 #congrats-overlay {
   position: fixed; inset: 0;
