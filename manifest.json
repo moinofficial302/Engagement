@@ -2,8 +2,8 @@
   "name": "Sam & Sofia – Wedding Invitation",
   "short_name": "Our Wedding",
   "description": "You're invited to the wedding of Sam & Sofia on June 15, 2026",
-  "start_url": "/index.html",
-  "scope": "/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a1628",
@@ -77,14 +77,14 @@
       "name": "View Venue",
       "short_name": "Venue",
       "description": "Open venue location in Google Maps",
-      "url": "/index.html#venue",
+      "url": "./index.html#venue",
       "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "Send Wishes",
       "short_name": "Wishes",
       "description": "Send a message to the couple",
-      "url": "/index.html#message",
+      "url": "./index.html#message",
       "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
     }
   ],
