@@ -18,11 +18,44 @@
 ═══════════════════════════════ */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    // Relative path (not '/sw.js') so this also works when the site is
+    // hosted in a sub-folder, e.g. GitHub Pages project sites:
+    // https://username.github.io/repo-name/
+    navigator.serviceWorker.register('sw.js')
       .then(reg => console.log('[App] Service worker registered:', reg.scope))
       .catch(err => console.warn('[App] Service worker registration failed:', err));
   });
 }
+
+/* ═══════════════════════════════
+   1b. INSTALL APP BUTTON
+   Browsers only fire 'beforeinstallprompt' when the site passes
+   installability checks: HTTPS, valid manifest (start_url/scope
+   reachable), icons, and an active service worker. Chrome/Edge/Brave
+   on Android support this; iOS Safari does not expose it — those
+   users install via Share → "Add to Home Screen" instead.
+═══════════════════════════════ */
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('install-btn')?.classList.add('show');
+});
+
+function installApp() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.finally(() => {
+    deferredInstallPrompt = null;
+    document.getElementById('install-btn')?.classList.remove('show');
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-btn')?.classList.remove('show');
+  deferredInstallPrompt = null;
+});
 
 /* ═══════════════════════════════
    2. ENVELOPE / DOOR OPEN
@@ -41,8 +74,8 @@ function openEnvelope() {
     main.classList.add('visible');
     document.body.style.overflow = 'auto';
 
-    // Greet the guest, then let them tap through to the invitation
-    showCongratsOverlay();
+    // Congrats popup now shows AFTER the scratch card is revealed
+    // (see checkRevealProgress() in the Scratch Card section below)
     startCountdown();
     startSlideshow();
   }, 1300);
@@ -139,8 +172,20 @@ function initScratchCard() {
   if (!canvas || !wrapper) return;
 
   const ctx = canvas.getContext('2d');
-  let isDrawing   = false;
-  let hasRevealed = false;
+  let isDrawing    = false;
+  let hasRevealed  = false;
+  let lastVibrateAt = 0;
+
+  // Short, evenly-spaced vibration pulses while scratching feel smoother
+  // on a phone than one long buzz. 40ms gap keeps it fluid without
+  // hammering the vibration motor.
+  function vibrateTick() {
+    if (!('vibrate' in navigator)) return; // not supported (e.g. iOS Safari)
+    const now = Date.now();
+    if (now - lastVibrateAt < 40) return;
+    lastVibrateAt = now;
+    navigator.vibrate(8);
+  }
 
   function sizeCanvas() {
     const rect = wrapper.getBoundingClientRect();
@@ -180,6 +225,7 @@ function initScratchCard() {
     ctx.beginPath();
     ctx.arc(x, y, 28, 0, Math.PI * 2);
     ctx.fill();
+    vibrateTick();
     checkRevealProgress();
   }
 
@@ -202,6 +248,13 @@ function initScratchCard() {
       canvas.style.transition = 'opacity 0.6s ease';
       canvas.style.opacity = '0';
       setTimeout(() => { canvas.style.pointerEvents = 'none'; }, 600);
+
+      // Distinct pattern (buzz-pause-buzz) so it feels like a "reward",
+      // different from the light scratching ticks
+      if ('vibrate' in navigator) navigator.vibrate([30, 40, 30]);
+
+      // Reveal complete — now show the congrats popup + confetti
+      setTimeout(showCongratsOverlay, 400);
     }
   }
 
