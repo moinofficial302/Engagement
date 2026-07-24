@@ -38,9 +38,26 @@
   --blush:      #f5ede8;
   --cream:      #fdf8f5;
   --gold:       #c9a96e;
-  --text-dark:  #3a2a2a;
-  --text-mid:   #7a5a5a;
-  --text-light: #b09090;
+  --text-dark:  #291d1d;  /* darkened ~30% from #3a2a2a for stronger contrast */
+  --text-mid:   #553f3f;  /* darkened ~30% from #7a5a5a */
+  --text-light: #7b6565;  /* darkened ~30% from #b09090 */
+}
+
+/* ─── 1b. PROFESSIONAL POLISH ─── */
+::selection {
+  background: var(--rose-light);
+  color: var(--text-dark);
+}
+a, button {
+  -webkit-tap-highlight-color: transparent;
+}
+a:focus-visible,
+button:focus-visible,
+.form-input:focus-visible,
+.form-select:focus-visible,
+.form-textarea:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 2px;
 }
 
 /* ─── 2. BASE / BODY ─── */
@@ -49,8 +66,12 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--cream);
   font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
   color: var(--text-dark);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* ─── 3. DOOR COVER ─── */
@@ -358,6 +379,7 @@ body {
 .invite-text p {
   font-family: 'Cormorant Garamond', serif;
   font-size: 17px;
+  font-weight: 500;
   line-height: 1.9;
   color: var(--text-mid);
   font-style: italic;
@@ -408,6 +430,7 @@ body {
 .names-father {
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
+  font-weight: 500;
   font-size: 13px;
   color: var(--text-light);
   margin-top: 8px;
@@ -479,6 +502,7 @@ body {
 #scratch-canvas:active { cursor: grabbing; }
 .scratch-hint {
   font-size: 11px;
+  font-weight: 500;
   letter-spacing: 2px;
   color: var(--text-light);
   text-transform: uppercase;
@@ -629,6 +653,7 @@ body {
 }
 .tl-time {
   font-size: 12px;
+  font-weight: 500;
   color: var(--text-light);
   margin-top: 2px;
 }
@@ -644,6 +669,7 @@ body {
 }
 .venue-addr {
   font-size: 13px;
+  font-weight: 500;
   color: var(--text-light);
   text-align: center;
   margin-bottom: 20px;
@@ -681,6 +707,7 @@ body {
 }
 .pw-detail {
   font-size: 12px;
+  font-weight: 500;
   color: var(--text-light);
   margin-top: 4px;
   line-height: 1.6;
@@ -691,7 +718,7 @@ body {
 .form-label {
   display: block;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-mid);
   letter-spacing: 1px;
   margin-bottom: 6px;
@@ -717,6 +744,12 @@ body {
 .form-textarea:focus {
   border-color: var(--rose);
   box-shadow: 0 0 0 3px rgba(197,118,138,0.1);
+}
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--text-light);
+  font-weight: 400;
+  opacity: 1;
 }
 .form-textarea { resize: vertical; min-height: 90px; }
 .send-btn {
@@ -773,6 +806,7 @@ body {
 .footer-names {
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
+  font-weight: 500;
   font-size: 20px;
   color: var(--text-mid);
 }
@@ -791,6 +825,7 @@ body {
 }
 .creator-bar p {
   font-size: 11px;
+  font-weight: 500;
   color: var(--text-light);
   letter-spacing: 0.5px;
 }
