@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a1628">
+  <meta name="description" content="Sam & Sofia Wedding Invitation">
+  <title>Sam & Sofia – Wedding Invitation</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Lottie Player -->
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       CONFETTI CONTAINER
+  ═══════════════════════════════════════ -->
+  <div id="confetti-container"></div>
+
+  <!-- ══════════════════════════════════════
+       TOAST NOTIFICATION
+  ═══════════════════════════════════════ -->
+  <div class="toast" id="toast">✓ Message sent!</div>
+
+  <!-- ══════════════════════════════════════
+       CONGRATS OVERLAY (after scratch)
+  ═══════════════════════════════════════ -->
+  <div id="congrats-overlay">
+    <div class="congrats-card">
+      <span class="congrats-emoji">🎉</span>
+      <div class="congrats-title">Congratulations!</div>
+      <p class="congrats-sub">You're cordially invited to our special day. We can't wait to celebrate with you!</p>
+      <button class="congrats-close" onclick="closeCongratsOverlay()">View Invitation ♥</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       DOOR COVER (Landing Screen)
+  ═══════════════════════════════════════ -->
+  <div id="envelope-cover" onclick="openEnvelope()">
+    <div class="door-left"></div>
+    <div class="door-right"></div>
+    <div class="door-center-line"></div>
+    <div class="envelope-inner">
+      <div class="env-card">
+        <span class="env-label">Wedding Invitation</span>
+        <div class="tap-btn">
+          <span class="w-letter">W</span>
+          <span class="tap-text-small">TAP TO OPEN</span>
+        </div>
+        <p class="tap-text">TAP TO OPEN</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════════ -->
+  <div id="main-content">
+
+    <!-- HERO -->
+    <div class="hero">
+      <img src="images/hero.jpg" alt="Sam & Sofia" class="hero-img">
+      <div class="hero-overlay">
+        <p class="hero-badge">We're getting married</p>
+        <div class="hero-name">
+          Sam
+          <span class="hero-amp">&amp;</span>
+          Sofía
+        </div>
+        <div class="hero-heart">♥</div>
+      </div>
+    </div>
+
+    <!-- SCROLL HINT -->
+    <div class="scroll-hint">Scroll to explore</div>
+
+    <!-- NAMES SECTION -->
+    <div class="names-section">
+      <div class="names-ornament">✦ ── ✦ ── ✦</div>
+      <div class="names-couple-block">
+        <div class="names-side">
+          <div class="names-person">Sam Kumar</div>
+          <div class="names-role">Groom</div>
+          <div class="names-father">S/o Mr. Ramesh Kumar</div>
+        </div>
+        <div class="names-ampersand">&amp;</div>
+        <div class="names-side">
+          <div class="names-person">Sofía Sharma</div>
+          <div class="names-role">Bride</div>
+          <div class="names-father">D/o Mr. Suresh Sharma</div>
+        </div>
+      </div>
+      <div class="names-ornament">✦ ── ✦ ── ✦</div>
+    </div>
+
+    <!-- SCRATCH CARD -->
+    <div class="scratch-section">
+      <div class="scratch-title">Scratch to Reveal</div>
+      <div class="divider"><span>♥</span></div>
+      <div class="scratch-wrapper">
+        <div class="scratch-revealed" id="scratch-revealed">
+          <p class="you-invited">You're Invited!</p>
+          <p class="date-text">June 15, 2026</p>
+          <p class="date-sub">Monday &nbsp;·&nbsp; 5:00 PM IST</p>
+        </div>
+        <canvas id="scratch-canvas"></canvas>
+      </div>
+      <p class="scratch-hint">Scratch the card above ✦</p>
+    </div>
+
+    <!-- COUNTDOWN -->
+    <div class="countdown-section">
+      <div class="countdown-label">Counting Down to Forever</div>
+      <div class="countdown-grid">
+        <div class="count-item">
+          <span class="count-num" id="cd-days">00</span>
+          <span class="count-unit">Days</span>
+        </div>
+        <div class="count-item">
+          <span class="count-num" id="cd-hours">00</span>
+          <span class="count-unit">Hours</span>
+        </div>
+        <div class="count-item">
+          <span class="count-num" id="cd-mins">00</span>
+          <span class="count-unit">Mins</span>
+        </div>
+        <div class="count-item">
+          <span class="count-num" id="cd-secs">00</span>
+          <span class="count-unit">Secs</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHOTO SLIDESHOW -->
+    <div class="section slideshow-section">
+      <div class="slideshow" id="slideshow">
+        <div class="slide active" id="slide-0">
+          <img src="images/photo1.jpg" alt="Wedding photo 1">
+          <div class="slide-overlay"></div>
+        </div>
+        <div class="slide" id="slide-1">
+          <img src="images/photo2.jpg" alt="Wedding photo 2">
+          <div class="slide-overlay"></div>
+        </div>
+        <div class="slide" id="slide-2">
+          <img src="images/photo3.jpg" alt="Wedding photo 3">
+          <div class="slide-overlay"></div>
+        </div>
+        <div class="slide" id="slide-3">
+          <img src="images/photo4.jpg" alt="Wedding photo 4">
+          <div class="slide-overlay"></div>
+        </div>
+        <div class="slide-dots">
+          <div class="slide-dot active" id="dot-0"></div>
+          <div class="slide-dot" id="dot-1"></div>
+          <div class="slide-dot" id="dot-2"></div>
+          <div class="slide-dot" id="dot-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRAM TIMELINE -->
+    <div class="section">
+      <div class="section-title">Program Timeline</div>
+      <div class="divider"><span>♥</span></div>
+      <div class="card">
+        <div class="card-icon">🕐</div>
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-title">Guest Arrival</div>
+            <div class="tl-time">15 Jun 2026 · 4:00 PM</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-title">Wedding Ceremony</div>
+            <div class="tl-time">15 Jun 2026 · 5:00 PM</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-title">Cocktail Hour</div>
+            <div class="tl-time">15 Jun 2026 · 6:30 PM</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-title">Dinner Reception</div>
+            <div class="tl-time">15 Jun 2026 · 7:30 PM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENUE -->
+    <div class="section" style="padding-top:0">
+      <div class="section-title">Venue</div>
+      <div class="divider"><span>♥</span></div>
+      <div class="card">
+        <div class="card-icon">📍</div>
+        <div class="venue-name">The Grand Palace</div>
+        <div class="venue-addr">123 Royal Avenue, London</div>
+        <a href="https://maps.google.com/?q=The+Grand+Palace+123+Royal+Avenue+London"
+           target="_blank" class="venue-map-btn">View on Google Maps</a>
+      </div>
+    </div>
+
+    <!-- PRE-WEDDING EVENTS -->
+    <div class="section" style="padding-top:0">
+      <div class="section-title">Pre-Wedding Events</div>
+      <div class="divider"><span>♥</span></div>
+      <div class="card">
+        <div class="card-icon">🎊</div>
+        <div class="prewedding-item">
+          <div class="pw-name">Mehendi</div>
+          <div class="pw-detail">13 Jun 2026 · 3:00 PM<br>at Bride's Home</div>
+        </div>
+        <div class="prewedding-item">
+          <div class="pw-name">Haldi</div>
+          <div class="pw-detail">14 Jun 2026 · 10:00 AM<br>at Groom's Home</div>
+        </div>
+        <div class="prewedding-item">
+          <div class="pw-name">Sangeet</div>
+          <div class="pw-detail">14 Jun 2026 · 7:00 PM<br>at Grand Palace Hall</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WITH LOVE -->
+    <div class="section" style="padding-top:0">
+      <div class="section-title">With Love</div>
+      <div class="divider"><span>♥</span></div>
+      <div class="card">
+        <div class="invite-text" style="margin:0;padding:8px 0">
+          <span class="wave-decor">〜 ♥ 〜</span>
+          <p>With hearts full of love and joy, we warmly invite you to share in the celebration
+             of our union. Your presence would mean the world to us as we begin this beautiful
+             journey together.</p>
+          <span class="wave-decor" style="margin-top:16px;margin-bottom:0">〜 ♥ 〜</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEND A MESSAGE -->
+    <div class="section" style="padding-top:0">
+      <div class="section-title">Send a Message</div>
+      <div class="divider"><span>♥</span></div>
+      <div class="card">
+        <div class="card-icon">✉️</div>
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" class="form-input" id="msg-name" placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="msg-email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Will you be attending?</label>
+          <select class="form-select" id="msg-attend">
+            <option value="">Select...</option>
+            <option value="yes">Yes, I'll be there! 🎉</option>
+            <option value="no">Sorry, can't make it</option>
+            <option value="maybe">Maybe</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your Message</label>
+          <textarea class="form-textarea" id="msg-text" placeholder="Write your wishes..."></textarea>
+        </div>
+        <button class="send-btn" onclick="sendMessage()">Send Message</button>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer-section">
+      <span class="footer-wave">〜 ✦ ♥ ✦ 〜</span>
+      <div class="footer-msg">We can't wait to<br>celebrate with you!</div>
+      <div class="footer-names">Sam &amp; Sofía</div>
+      <span class="footer-wave-bottom">〜 ✦ ♥ ✦ 〜</span>
+    </div>
+
+    <!-- CREATOR BAR -->
+    <div class="creator-bar">
+      <p>
+        Created by Akans_Web &nbsp;·&nbsp;
+        <a class="creator-link" onclick="openWhatsApp()">Create your own wedding invitation</a>
+      </p>
+    </div>
+
+  </div><!-- end #main-content -->
+
+  <!-- JS loaded at bottom -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>
