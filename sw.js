@@ -11,20 +11,24 @@
 
 'use strict';
 
-const CACHE_NAME    = 'wedding-v1.0.0';
-const OFFLINE_PAGE  = '/offline.html';
+const CACHE_NAME    = 'wedding-v1.0.1';
+const OFFLINE_PAGE  = 'offline.html';
 
-/* ── Files to pre-cache on install ── */
+/* ── Files to pre-cache on install ──
+   NOTE: paths are relative (no leading "/"). They resolve against this
+   file's own location (self.location), so this works whether the site
+   is hosted at the domain root OR in a sub-folder, e.g. GitHub Pages
+   project sites: https://username.github.io/repo-name/                */
 const PRECACHE_ASSETS = [
-  '/',
-  '/index.html',
-  '/css/style.css',
-  '/js/app.js',
-  '/manifest.json',
-  '/offline.html',
-  '/lottie/hearts.json',
-  '/lottie/rings.json',
-  '/lottie/confetti-burst.json'
+  './',
+  'index.html',
+  'css/style.css',
+  'js/app.js',
+  'manifest.json',
+  'offline.html',
+  'lottie/hearts.json',
+  'lottie/rings.json',
+  'lottie/confetti-burst.json'
 ];
 
 /* ── CDN assets to cache on first use ── */
