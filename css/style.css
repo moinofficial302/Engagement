@@ -443,6 +443,35 @@ body {
   font-size: 26px;
   color: var(--gold);
   flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rings-lottie {
+  width: 56px;
+  height: 56px;
+}
+
+/* ─── With Love card: hearts background decoration ─── */
+.invite-card {
+  position: relative;
+  overflow: hidden;
+}
+.hearts-lottie-bg {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 220px;
+  opacity: 0.10;
+  pointer-events: none;
+  z-index: 0;
+}
+.invite-card .invite-text {
+  position: relative;
+  z-index: 1;
 }
 
 /* ─── 10. SCRATCH CARD ─── */
