@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin Dashboard — Sam & Sofía Wedding</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="dash-header">
+    <div class="dash-title"><span class="heart">♥</span> Admin Panel</div>
+    <button class="btn-ghost" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- TABS -->
+  <div class="dash-tabs">
+    <button class="dash-tab active" data-tab="messages" onclick="switchTab('messages')">📩 Messages</button>
+    <button class="dash-tab" data-tab="content" onclick="switchTab('content')">✍️ Edit Content</button>
+  </div>
+
+  <div class="dash-content">
+
+    <!-- ═══════════════ MESSAGES TAB ═══════════════ -->
+    <div class="tab-panel active" id="tab-messages">
+
+      <div class="summary-row">
+        <div class="summary-card"><span class="summary-num" id="sum-total">0</span><span class="summary-label">Total</span></div>
+        <div class="summary-card"><span class="summary-num" id="sum-yes">0</span><span class="summary-label">Coming</span></div>
+        <div class="summary-card"><span class="summary-num" id="sum-no">0</span><span class="summary-label">Can't Make It</span></div>
+        <div class="summary-card"><span class="summary-num" id="sum-maybe">0</span><span class="summary-label">Maybe</span></div>
+      </div>
+
+      <div class="filter-row">
+        <button class="filter-chip active" data-filter="all" onclick="setFilter('all')">All</button>
+        <button class="filter-chip" data-filter="yes" onclick="setFilter('yes')">I'll be there</button>
+        <button class="filter-chip" data-filter="no" onclick="setFilter('no')">Can't make it</button>
+        <button class="filter-chip" data-filter="maybe" onclick="setFilter('maybe')">Maybe</button>
+      </div>
+
+      <div id="rsvp-list">
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ EDIT CONTENT TAB ═══════════════ -->
+    <div class="tab-panel" id="tab-content">
+
+      <div class="editor-card">
+        <div class="editor-card-title">💑 Couple Names</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Groom's Display Name</label>
+            <input type="text" class="form-input" id="c-groom-name" placeholder="Sam">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bride's Display Name</label>
+            <input type="text" class="form-input" id="c-bride-name" placeholder="Sofía">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Groom's Full Name</label>
+            <input type="text" class="form-input" id="c-groom-fullname" placeholder="Sam Kumar">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bride's Full Name</label>
+            <input type="text" class="form-input" id="c-bride-fullname" placeholder="Sofía Sharma">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Groom's Parent Line</label>
+            <input type="text" class="form-input" id="c-groom-parent" placeholder="S/o Mr. Ramesh Kumar">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bride's Parent Line</label>
+            <input type="text" class="form-input" id="c-bride-parent" placeholder="D/o Mr. Suresh Sharma">
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-card">
+        <div class="editor-card-title">📅 Wedding Date &amp; Time</div>
+        <div class="form-group">
+          <label class="form-label">Date &amp; Time</label>
+          <input type="datetime-local" class="form-input" id="c-wedding-date">
+        </div>
+      </div>
+
+      <div class="editor-card">
+        <div class="editor-card-title">📍 Venue</div>
+        <div class="form-group">
+          <label class="form-label">Venue Name</label>
+          <input type="text" class="form-input" id="c-venue-name" placeholder="The Grand Palace">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <input type="text" class="form-input" id="c-venue-addr" placeholder="123 Royal Avenue, London">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Google Maps Link</label>
+          <input type="url" class="form-input" id="c-venue-map" placeholder="https://maps.google.com/?q=...">
+        </div>
+      </div>
+
+      <div class="editor-card">
+        <div class="editor-card-title">🕐 Program Timeline</div>
+        <div id="timeline-editor"></div>
+        <button type="button" class="add-row-btn" onclick="addTimelineRow()">+ Add Timeline Item</button>
+      </div>
+
+      <div class="editor-card">
+        <div class="editor-card-title">🎊 Pre-Wedding Events</div>
+        <div id="prewedding-editor"></div>
+        <button type="button" class="add-row-btn" onclick="addPreweddingRow()">+ Add Event</button>
+      </div>
+
+      <div class="editor-card">
+        <div class="editor-card-title">💌 Invitation Text</div>
+        <div class="form-group">
+          <textarea class="form-textarea" id="c-invitation-text" placeholder="With hearts full of love..."></textarea>
+        </div>
+      </div>
+
+      <div class="editor-card">
+        <div class="editor-card-title">👋 Footer Message</div>
+        <div class="form-group">
+          <input type="text" class="form-input" id="c-footer-message" placeholder="We can't wait to celebrate with you!">
+        </div>
+      </div>
+
+      <div class="save-bar">
+        <button class="btn-primary" id="save-btn" onclick="saveContent()">Save Changes</button>
+        <p class="save-status" id="save-status"></p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+
+</body>
+</html>
