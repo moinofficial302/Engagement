@@ -11,19 +11,23 @@
 
 'use strict';
 
-const CACHE_NAME    = 'wedding-v1.0.1';
+const CACHE_NAME    = 'wedding-v1.0.2';
 const OFFLINE_PAGE  = 'offline.html';
 
 /* ── Files to pre-cache on install ──
    NOTE: paths are relative (no leading "/"). They resolve against this
    file's own location (self.location), so this works whether the site
    is hosted at the domain root OR in a sub-folder, e.g. GitHub Pages
-   project sites: https://username.github.io/repo-name/                */
+   project sites: https://username.github.io/repo-name/
+   Firebase SDK files are loaded from Google's CDN and intentionally
+   NOT precached here — the network-first/stale-while-revalidate logic
+   below still caches them opportunistically once fetched.            */
 const PRECACHE_ASSETS = [
   './',
   'index.html',
   'css/style.css',
   'js/app.js',
+  'js/firebase-config.js',
   'manifest.json',
   'offline.html',
   'lottie/hearts.json',
