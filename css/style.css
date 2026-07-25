@@ -38,9 +38,9 @@
   --blush:      #f5ede8;
   --cream:      #fdf8f5;
   --gold:       #c9a96e;
-  --text-dark:  #291d1d;  /* darkened ~30% from #3a2a2a for stronger contrast */
-  --text-mid:   #553f3f;  /* darkened ~30% from #7a5a5a */
-  --text-light: #7b6565;  /* darkened ~30% from #b09090 */
+  --text-dark:  #211717;  /* darkened another ~20% from #291d1d */
+  --text-mid:   #443232;  /* darkened another ~20% from #553f3f */
+  --text-light: #625151;  /* darkened another ~20% from #7b6565 */
 }
 
 /* ─── 1b. PROFESSIONAL POLISH ─── */
@@ -79,28 +79,44 @@ body {
   position: fixed; inset: 0;
   z-index: 1000;
   overflow: hidden;
-  background: #0a1628;
+  background: linear-gradient(160deg, #7a3a52 0%, #a85870 55%, #c5768a 100%);
   perspective: 1400px;
   perspective-origin: 50% 50%;
   cursor: pointer;
 }
 
-/* Diamond pattern background */
+/* Subtle pattern background */
 #envelope-cover::before {
   content: '';
   position: absolute; inset: 0;
   background-image:
-    linear-gradient(45deg,  rgba(201,169,110,0.08) 1px, transparent 1px),
-    linear-gradient(-45deg, rgba(201,169,110,0.08) 1px, transparent 1px);
+    linear-gradient(45deg,  rgba(255,255,255,0.07) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(255,255,255,0.07) 1px, transparent 1px);
   background-size: 40px 40px;
   z-index: 0;
+}
+
+/* Glow burst that blooms outward as the doors part (upgraded open animation) */
+#envelope-cover::after {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  width: 0; height: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 70%);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  opacity: 0;
+  transition: width 1.1s ease, height 1.1s ease, opacity 1.1s ease;
+}
+#envelope-cover.opening::after {
+  width: 900px; height: 900px;
+  opacity: 1;
 }
 
 /* Two door panels */
 .door-left, .door-right {
   position: absolute; top: 0; bottom: 0;
   width: 50%;
-  background: linear-gradient(160deg, #0d1f3c 0%, #0a1628 60%, #071020 100%);
+  background: linear-gradient(160deg, #7a3a52 0%, #a85870 55%, #c5768a 100%);
   z-index: 2;
   will-change: transform;
   backface-visibility: hidden;
@@ -109,23 +125,23 @@ body {
 .door-left {
   left: 0;
   transform-origin: left center;
-  box-shadow: inset -3px 0 12px rgba(201,169,110,0.2);
+  box-shadow: inset -3px 0 12px rgba(255,255,255,0.15);
   transition: transform 1.3s cubic-bezier(0.86, 0, 0.07, 1);
 }
 .door-right {
   right: 0;
   transform-origin: right center;
-  box-shadow: inset 3px 0 12px rgba(201,169,110,0.2);
+  box-shadow: inset 3px 0 12px rgba(255,255,255,0.15);
   transition: transform 1.3s cubic-bezier(0.86, 0, 0.07, 1);
 }
 
-/* Diamond pattern on each door panel */
+/* Subtle pattern on each door panel */
 .door-left::before, .door-right::before {
   content: '';
   position: absolute; inset: 0;
   background-image:
-    linear-gradient(45deg,  rgba(201,169,110,0.06) 1px, transparent 1px),
-    linear-gradient(-45deg, rgba(201,169,110,0.06) 1px, transparent 1px);
+    linear-gradient(45deg,  rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(255,255,255,0.06) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -143,9 +159,9 @@ body {
   background: linear-gradient(to bottom, transparent, #c9a96e 15%, #c9a96e 85%, transparent);
 }
 
-/* Door open animation */
-#envelope-cover.opening .door-left  { transform: rotateY(-100deg); }
-#envelope-cover.opening .door-right { transform: rotateY(100deg); }
+/* Door open animation — swing open with a touch of depth (scale) */
+#envelope-cover.opening .door-left  { transform: rotateY(-100deg) scale(0.97); }
+#envelope-cover.opening .door-right { transform: rotateY(100deg) scale(0.97); }
 #envelope-cover.opening .door-center-line,
 #envelope-cover.opening .envelope-inner {
   opacity: 0;
@@ -179,7 +195,7 @@ body {
   font-style: italic;
   font-weight: 500;
   font-size: 14px;
-  color: #c9a96e;
+  color: white;
   letter-spacing: 4px;
   text-transform: uppercase;
   margin-bottom: 36px;
@@ -188,31 +204,31 @@ body {
 
 .tap-btn {
   width: 110px; height: 110px;
-  background: linear-gradient(145deg, #162a4e, #0d1f3c);
+  background: linear-gradient(145deg, #ffffff, #fdf1f4);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   flex-direction: column;
   margin: 0 auto 20px;
   border: 2px solid #c9a96e;
   box-shadow:
-    0 0 0 6px  rgba(201,169,110,0.10),
-    0 0 0 12px rgba(201,169,110,0.05),
-    0 8px 30px rgba(0,0,0,0.4);
+    0 0 0 6px  rgba(255,255,255,0.25),
+    0 0 0 12px rgba(255,255,255,0.12),
+    0 8px 30px rgba(90,30,50,0.35);
   animation: pulse 2.5s ease-in-out infinite;
   cursor: pointer;
 }
 @keyframes pulse {
   0%, 100% {
     box-shadow:
-      0 0 0 6px  rgba(201,169,110,0.10),
-      0 0 0 12px rgba(201,169,110,0.05),
-      0 8px 30px rgba(0,0,0,0.4);
+      0 0 0 6px  rgba(255,255,255,0.25),
+      0 0 0 12px rgba(255,255,255,0.12),
+      0 8px 30px rgba(90,30,50,0.35);
   }
   50% {
     box-shadow:
-      0 0 0 10px rgba(201,169,110,0.15),
-      0 0 0 20px rgba(201,169,110,0.07),
-      0 8px 30px rgba(0,0,0,0.4);
+      0 0 0 10px rgba(255,255,255,0.32),
+      0 0 0 20px rgba(255,255,255,0.15),
+      0 8px 30px rgba(90,30,50,0.35);
   }
 }
 
@@ -220,7 +236,7 @@ body {
   font-family: 'Cormorant Garamond', serif;
   font-size: 32px;
   font-weight: 600;
-  color: #c9a96e;
+  color: var(--rose-dark);
   line-height: 1;
   margin-bottom: 4px;
 }
@@ -228,14 +244,14 @@ body {
 .tap-text-small {
   font-size: 8px;
   letter-spacing: 2px;
-  color: #c9a96e;
+  color: var(--rose-dark);
   text-transform: uppercase;
 }
 
 .tap-text {
   font-size: 10px;
   letter-spacing: 3px;
-  color: #c9a96e;
+  color: white;
   text-transform: uppercase;
   font-weight: 400;
   margin-top: 4px;
@@ -353,8 +369,9 @@ body {
 .slideshow-section { padding-top: 0; }
 
 .section-title {
-  font-family: 'Great Vibes', cursive;
-  font-size: 38px;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 32px;
   color: var(--rose);
   text-align: center;
   margin-bottom: 8px;
@@ -426,8 +443,9 @@ body {
 }
 .names-side { flex: 1; }
 .names-person {
-  font-family: 'Great Vibes', cursive;
-  font-size: 34px;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 28px;
   color: var(--text-dark);
   line-height: 1.2;
 }
@@ -492,8 +510,9 @@ body {
   margin: 0 auto;
 }
 .scratch-title {
-  font-family: 'Great Vibes', cursive;
-  font-size: 38px;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 32px;
   color: var(--rose);
   margin-bottom: 8px;
 }
@@ -515,8 +534,9 @@ body {
   background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dark) 100%);
 }
 .you-invited {
-  font-family: 'Great Vibes', cursive;
-  font-size: 36px;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 30px;
   color: white;
   margin-bottom: 6px;
 }
@@ -569,7 +589,7 @@ body {
 .slideshow {
   position: relative;
   width: 100%;
-  aspect-ratio: 4/5;
+  aspect-ratio: 4/3;
   overflow: hidden;
   background: #0a1628;
   border: 1.5px solid var(--rose-dark);
@@ -643,8 +663,9 @@ body {
   background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c5768a' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 .countdown-label {
-  font-family: 'Great Vibes', cursive;
-  font-size: 34px;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 30px;
   line-height: 1.2;
   color: var(--rose-dark);
   margin-bottom: 24px;
@@ -806,8 +827,9 @@ body {
 }
 .prewedding-item:last-child { border-bottom: none; }
 .pw-name {
-  font-family: 'Great Vibes', cursive;
-  font-size: 28px;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 22px;
   color: var(--rose);
 }
 .pw-detail {
@@ -902,8 +924,9 @@ body {
   margin-bottom: 24px;
 }
 .footer-msg {
-  font-family: 'Great Vibes', cursive;
-  font-size: 32px;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 26px;
   color: var(--rose);
   line-height: 1.4;
   margin-bottom: 16px;
@@ -994,14 +1017,14 @@ body {
 #congrats-overlay.show { display: flex; }
 
 .congrats-card {
-  background: linear-gradient(145deg, #0d1f3c, #1a2a4a);
-  border: 1px solid #c9a96e;
+  background: linear-gradient(145deg, #ffffff, #fdf1f4);
+  border: 1px solid var(--gold);
   border-radius: 24px;
   padding: 48px 36px;
   text-align: center;
   max-width: 300px;
   width: 85%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,169,110,0.3);
+  box-shadow: 0 20px 60px rgba(90,30,50,0.25), 0 0 0 1px rgba(201,169,110,0.2);
   animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
 }
 @keyframes popIn {
@@ -1010,9 +1033,10 @@ body {
 }
 .congrats-emoji  { font-size: 52px; margin-bottom: 12px; display: block; }
 .congrats-title  {
-  font-family: 'Great Vibes', cursive;
-  font-size: 40px;
-  color: #c9a96e;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 32px;
+  color: var(--rose-dark);
   margin-bottom: 8px;
 }
 .congrats-sub {
@@ -1020,12 +1044,12 @@ body {
   font-style: italic;
   font-weight: 500;
   font-size: 16px;
-  color: rgba(255,255,255,0.88);
+  color: var(--text-mid);
   margin-bottom: 24px;
   line-height: 1.6;
 }
 .congrats-close {
-  background: linear-gradient(135deg, #c9a96e, #b8934a);
+  background: linear-gradient(135deg, var(--rose), var(--rose-dark));
   color: white;
   border: none;
   padding: 12px 32px;
