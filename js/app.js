@@ -2,6 +2,7 @@
    WEDDING INVITATION — app.js
    Structure:
    1. Service Worker Registration
+   1b. Install App Button
    2. Envelope / Door Open
    3. Congrats Overlay + Confetti
    4. Countdown Timer
@@ -9,6 +10,7 @@
    6. Photo Slideshow
    7. Contact Form + Toast (Firestore)
    8. WhatsApp / Creator Link
+   8b. Background Music
    9. Site Content (Firestore)
 ═══════════════════════════════════════════════════ */
 
@@ -75,9 +77,14 @@ function openEnvelope() {
     main.classList.add('visible');
     document.body.style.overflow = 'auto';
 
+    // The scratch card wrapper was 0×0 while hidden behind the envelope —
+    // repaint it now that it has real dimensions (see initScratchCard).
+    requestAnimationFrame(() => { if (scratchResizeFn) scratchResizeFn(); });
+
     // Congrats popup now shows AFTER the scratch card is revealed
     // (see checkRevealProgress() in the Scratch Card section below)
     startSlideshow();
+    playMusic(); // first genuine user gesture — browsers allow audio to start here
   }, 1300);
 }
 
@@ -169,6 +176,8 @@ function startCountdown(isoDateString) {
 /* ═══════════════════════════════
    5. SCRATCH CARD
 ═══════════════════════════════ */
+let scratchResizeFn = null; // exposed so openEnvelope() can trigger a repaint once visible
+
 function initScratchCard() {
   const canvas  = document.getElementById('scratch-canvas');
   const wrapper = document.querySelector('.scratch-wrapper');
@@ -192,8 +201,15 @@ function initScratchCard() {
 
   function sizeCanvas() {
     const rect = wrapper.getBoundingClientRect();
+    // #main-content is display:none behind the envelope, so the very first
+    // call (on page load) sees a 0×0 wrapper. Skip painting until we have
+    // real dimensions — openEnvelope() calls this again once it's visible.
+    if (rect.width === 0 || rect.height === 0) return;
     canvas.width  = rect.width;
     canvas.height = rect.height;
+    canvas.style.opacity = '1';
+    canvas.style.pointerEvents = 'auto';
+    hasRevealed = false;
     paintScratchLayer();
   }
 
@@ -282,7 +298,8 @@ function initScratchCard() {
   canvas.addEventListener('touchmove', draw, { passive: false });
 
   window.addEventListener('resize', sizeCanvas);
-  sizeCanvas();
+  scratchResizeFn = sizeCanvas; // openEnvelope() calls this once the card is actually visible
+  sizeCanvas(); // no-op right now (wrapper is 0×0 behind the closed envelope)
 }
 
 /* ═══════════════════════════════
@@ -388,6 +405,39 @@ function openWhatsApp() {
 }
 
 /* ═══════════════════════════════
+   8b. BACKGROUND MUSIC
+   Upload a file named "wedding-music.mp3" into an "audio" folder
+   at the site root (audio/wedding-music.mp3) for this to work.
+   Autoplay-with-sound is blocked by browsers until the visitor
+   interacts with the page, so playback starts on the envelope tap
+   (see openEnvelope above) rather than on page load.
+═══════════════════════════════ */
+function playMusic() {
+  const audio = document.getElementById('bg-music');
+  const btn   = document.getElementById('music-toggle');
+  if (!audio) return;
+  audio.play()
+    .then(() => { btn?.classList.remove('muted'); if (btn) btn.textContent = '🔊'; })
+    .catch(err => console.warn('[App] Music autoplay blocked, use the toggle button:', err));
+}
+
+function toggleMusic() {
+  const audio = document.getElementById('bg-music');
+  const btn   = document.getElementById('music-toggle');
+  if (!audio) return;
+
+  if (audio.paused) {
+    audio.play()
+      .then(() => { btn?.classList.remove('muted'); if (btn) btn.textContent = '🔊'; })
+      .catch(err => console.warn('[App] Could not play music:', err));
+  } else {
+    audio.pause();
+    btn?.classList.add('muted');
+    if (btn) btn.textContent = '🔇';
+  }
+}
+
+/* ═══════════════════════════════
    9. SITE CONTENT (Firestore)
    Pulls editable text from siteContent/main, written by the admin
    panel. If the doc doesn't exist yet, or the device is offline, the
@@ -444,6 +494,7 @@ function applySiteContent(data) {
     setText('venue-addr', data.venue.address);
     const mapBtn = document.getElementById('venue-map-btn');
     if (mapBtn && data.venue.mapLink) mapBtn.href = data.venue.mapLink;
+    updateVenueMapEmbed(data.venue.name, data.venue.address);
   }
 
   // Timeline (array of { title, time })
@@ -484,6 +535,15 @@ function escapeHTML(str) {
   const div = document.createElement('div');
   div.textContent = str ?? '';
   return div.innerHTML;
+}
+
+function updateVenueMapEmbed(name, address) {
+  const query = encodeURIComponent(`${name || ''} ${address || ''}`.trim());
+  if (!query) return;
+  const embed   = document.getElementById('venue-map-embed');
+  const openBtn = document.getElementById('venue-map-open-btn');
+  if (embed)   embed.src   = `https://www.google.com/maps?q=${query}&output=embed`;
+  if (openBtn) openBtn.href = `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
 /* ═══════════════════════════════
