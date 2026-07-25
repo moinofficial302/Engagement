@@ -27,6 +27,16 @@
   <div id="confetti-container"></div>
 
   <!-- ══════════════════════════════════════
+       BACKGROUND MUSIC
+       Upload your music file to the "audio" folder as
+       "wedding-music.mp3" (exact name) for this to work.
+  ═══════════════════════════════════════ -->
+  <audio id="bg-music" src="audio/wedding-music.mp3" loop preload="none"></audio>
+  <button id="music-toggle" class="music-toggle" onclick="toggleMusic()" aria-label="Toggle background music">
+    🔊
+  </button>
+
+  <!-- ══════════════════════════════════════
        TOAST NOTIFICATION
   ═══════════════════════════════════════ -->
   <div class="toast" id="toast">✓ Message sent!</div>
@@ -185,10 +195,15 @@
 
     <!-- PROGRAM TIMELINE -->
     <div class="section">
+      <div class="section-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <div class="section-title">Program Timeline</div>
       <div class="divider"><span>♥</span></div>
       <div class="card">
-        <div class="card-icon">🕐</div>
         <div id="timeline-list">
         <div class="timeline-item">
           <div class="tl-dot"></div>
@@ -227,10 +242,29 @@
       <div class="section-title">Venue</div>
       <div class="divider"><span>♥</span></div>
       <div class="card">
-        <div class="card-icon">📍</div>
         <div class="venue-name" id="venue-name">The Grand Palace</div>
         <div class="venue-addr" id="venue-addr">123 Royal Avenue, London</div>
-        <a href="https://maps.google.com/?q=The+Grand+Palace+123+Royal+Avenue+London"
+
+        <div class="venue-map-wrap">
+          <iframe
+            id="venue-map-embed"
+            class="venue-map-embed"
+            src="https://www.google.com/maps?q=The+Grand+Palace+123+Royal+Avenue+London&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Venue location map">
+          </iframe>
+          <a href="https://www.google.com/maps/search/?api=1&query=The+Grand+Palace+123+Royal+Avenue+London"
+             target="_blank" class="venue-map-open-btn" id="venue-map-open-btn">Open in Maps ↗</a>
+        </div>
+
+        <div class="venue-illustration">
+          <svg viewBox="0 0 200 60" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M10 55 V30 M30 55 V20 Q30 12 40 12 Q50 12 50 20 V55 M50 55 V30 M70 55 V25 Q70 10 100 10 Q130 10 130 25 V55 M150 55 V30 M150 20 Q150 12 160 12 Q170 12 170 20 V55 M190 55 V30 M20 55 H190 M85 55 V40 Q85 32 100 32 Q115 32 115 40 V55"/>
+          </svg>
+        </div>
+
+        <a href="https://www.google.com/maps/search/?api=1&query=The+Grand+Palace+123+Royal+Avenue+London"
            target="_blank" class="venue-map-btn" id="venue-map-btn">View on Google Maps</a>
       </div>
     </div>
