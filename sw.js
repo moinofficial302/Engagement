@@ -11,7 +11,7 @@
 
 'use strict';
 
-const CACHE_NAME    = 'wedding-v1.0.2';
+const CACHE_NAME    = 'wedding-v1.0.3';
 const OFFLINE_PAGE  = 'offline.html';
 
 /* ── Files to pre-cache on install ──
@@ -32,7 +32,14 @@ const PRECACHE_ASSETS = [
   'offline.html',
   'lottie/hearts.json',
   'lottie/rings.json',
-  'lottie/confetti-burst.json'
+  'lottie/confetti-burst.json',
+  'admin/login.html',
+  'admin/dashboard.html',
+  'admin/manifest.json',
+  'admin/css/admin.css',
+  'admin/js/auth.js',
+  'admin/js/admin.js',
+  'admin/js/install.js'
 ];
 
 /* ── CDN assets to cache on first use ── */
