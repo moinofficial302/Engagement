@@ -7,8 +7,9 @@
    4. Countdown Timer
    5. Scratch Card
    6. Photo Slideshow
-   7. Contact Form + Toast
+   7. Contact Form + Toast (Firestore)
    8. WhatsApp / Creator Link
+   9. Site Content (Firestore)
 ═══════════════════════════════════════════════════ */
 
 'use strict';
@@ -76,7 +77,6 @@ function openEnvelope() {
 
     // Congrats popup now shows AFTER the scratch card is revealed
     // (see checkRevealProgress() in the Scratch Card section below)
-    startCountdown();
     startSlideshow();
   }, 1300);
 }
@@ -119,19 +119,22 @@ function playConfetti() {
 
 /* ═══════════════════════════════
    4. COUNTDOWN TIMER
-   Wedding: 15 June 2026, 5:00 PM IST
+   Default falls back to 15 June 2026, 5:00 PM IST if
+   Firestore content hasn't loaded yet (see loadSiteContent below,
+   which calls this again once the real date is known).
 ═══════════════════════════════ */
 let countdownInterval = null;
 
-function startCountdown() {
-  if (countdownInterval) return; // already running
-
-  const WEDDING_DATE = new Date('2026-06-15T17:00:00+05:30');
+function startCountdown(isoDateString) {
+  const WEDDING_DATE = new Date(isoDateString || '2026-06-15T17:00:00+05:30');
 
   const daysEl  = document.getElementById('cd-days');
   const hoursEl = document.getElementById('cd-hours');
   const minsEl  = document.getElementById('cd-mins');
   const secsEl  = document.getElementById('cd-secs');
+  if (!daysEl) return;
+
+  if (countdownInterval) clearInterval(countdownInterval); // restart with new date
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -319,49 +322,54 @@ function startSlideshow() {
 }
 
 /* ═══════════════════════════════
-   7. CONTACT FORM + TOAST
+   7. CONTACT FORM + TOAST (Firestore)
 ═══════════════════════════════ */
 function sendMessage() {
   const nameEl   = document.getElementById('msg-name');
-  const emailEl  = document.getElementById('msg-email');
+  const phoneEl  = document.getElementById('msg-phone');
   const attendEl = document.getElementById('msg-attend');
   const textEl   = document.getElementById('msg-text');
+  const btn      = document.querySelector('.send-btn');
 
-  [nameEl, emailEl, attendEl, textEl].forEach(el => el.classList.remove('error'));
+  [nameEl, phoneEl, attendEl, textEl].forEach(el => el.classList.remove('error'));
 
   let valid = true;
   if (!nameEl.value.trim()) { nameEl.classList.add('error'); valid = false; }
-  if (!emailEl.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
-    emailEl.classList.add('error'); valid = false;
+  if (!phoneEl.value.trim() || !/^[0-9+\-\s()]{7,16}$/.test(phoneEl.value.trim())) {
+    phoneEl.classList.add('error'); valid = false;
   }
   if (!attendEl.value) { attendEl.classList.add('error'); valid = false; }
   if (!textEl.value.trim()) { textEl.classList.add('error'); valid = false; }
 
   if (!valid) return;
 
-  // Store RSVP locally (no backend wired up yet — see sw.js background sync stub)
   const rsvp = {
     name: nameEl.value.trim(),
-    email: emailEl.value.trim(),
+    phone: phoneEl.value.trim(),
     attending: attendEl.value,
     message: textEl.value.trim(),
-    sentAt: new Date().toISOString()
+    sentAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
-  try {
-    const existing = JSON.parse(localStorage.getItem('wedding-rsvps') || '[]');
-    existing.push(rsvp);
-    localStorage.setItem('wedding-rsvps', JSON.stringify(existing));
-  } catch (err) {
-    console.warn('[App] Could not save RSVP locally:', err);
-  }
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
 
-  showToast('✓ Message sent!');
-
-  nameEl.value = '';
-  emailEl.value = '';
-  attendEl.value = '';
-  textEl.value = '';
+  db.collection('rsvps').add(rsvp)
+    .then(() => {
+      showToast('✓ Message sent!');
+      nameEl.value = '';
+      phoneEl.value = '';
+      attendEl.value = '';
+      textEl.value = '';
+    })
+    .catch(err => {
+      console.error('[App] Could not save RSVP:', err);
+      showToast('✗ Could not send — check your connection');
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = 'Send Message';
+    });
 }
 
 function showToast(message) {
@@ -380,9 +388,110 @@ function openWhatsApp() {
 }
 
 /* ═══════════════════════════════
+   9. SITE CONTENT (Firestore)
+   Pulls editable text from siteContent/main, written by the admin
+   panel. If the doc doesn't exist yet, or the device is offline, the
+   hardcoded HTML already on the page stays as-is (graceful fallback).
+═══════════════════════════════ */
+function loadSiteContent() {
+  db.collection('siteContent').doc('main').get()
+    .then(doc => {
+      if (!doc.exists) return; // admin hasn't saved anything yet — keep static content
+      const data = doc.data();
+      applySiteContent(data);
+    })
+    .catch(err => {
+      console.warn('[App] Could not load site content, using defaults:', err);
+    });
+}
+
+function setText(id, value) {
+  if (value === undefined || value === null || value === '') return;
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function applySiteContent(data) {
+  // Hero + Names
+  if (data.coupleNames) {
+    const c = data.coupleNames;
+    setText('hero-groom-name', c.groomName);
+    setText('hero-bride-name', c.brideName);
+    setText('names-groom-name', c.groomFullName || c.groomName);
+    setText('names-bride-name', c.brideFullName || c.brideName);
+    setText('names-groom-parent', c.groomParent);
+    setText('names-bride-parent', c.brideParent);
+    if (c.groomName && c.brideName) {
+      setText('footer-couple-names', `${c.groomName} & ${c.brideName}`);
+    }
+  }
+
+  // Wedding date/time — drives countdown + scratch card text
+  if (data.weddingDateISO) {
+    startCountdown(data.weddingDateISO);
+    const d = new Date(data.weddingDateISO);
+    if (!isNaN(d)) {
+      setText('scratch-date-text', d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }));
+      const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
+      const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      setText('scratch-date-sub', `${dayName}  ·  ${time}`);
+    }
+  }
+
+  // Venue
+  if (data.venue) {
+    setText('venue-name', data.venue.name);
+    setText('venue-addr', data.venue.address);
+    const mapBtn = document.getElementById('venue-map-btn');
+    if (mapBtn && data.venue.mapLink) mapBtn.href = data.venue.mapLink;
+  }
+
+  // Timeline (array of { title, time })
+  if (Array.isArray(data.timeline) && data.timeline.length) {
+    const list = document.getElementById('timeline-list');
+    if (list) {
+      list.innerHTML = data.timeline.map(item => `
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-title">${escapeHTML(item.title)}</div>
+            <div class="tl-time">${escapeHTML(item.time)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Pre-wedding events (array of { name, detail })
+  if (Array.isArray(data.preWeddingEvents) && data.preWeddingEvents.length) {
+    const list = document.getElementById('prewedding-list');
+    if (list) {
+      list.innerHTML = data.preWeddingEvents.map(item => `
+        <div class="prewedding-item">
+          <div class="pw-name">${escapeHTML(item.name)}</div>
+          <div class="pw-detail">${escapeHTML(item.detail)}</div>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Invitation + footer text
+  setText('invitation-text', data.invitationText);
+  setText('footer-message', data.footerMessage);
+}
+
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+
+/* ═══════════════════════════════
    INIT — things that don't depend
    on the envelope being opened
 ═══════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   initScratchCard();
+  startCountdown(); // fallback date; upgraded by loadSiteContent() below once Firestore responds
+  loadSiteContent();
 });
