@@ -11,7 +11,7 @@
 
 'use strict';
 
-const CACHE_NAME    = 'wedding-v1.0.3';
+const CACHE_NAME    = 'wedding-v1.0.5';
 const OFFLINE_PAGE  = 'offline.html';
 
 /* ── Files to pre-cache on install ──
@@ -107,9 +107,11 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // ── Images → Cache First ──
+  // ── Images → Stale While Revalidate ──
+  // (was Cache First — that meant a replaced hero.jpg with the SAME
+  // filename would stay stuck showing the old cached copy forever)
   if (request.destination === 'image') {
-    event.respondWith(cacheFirst(request));
+    event.respondWith(staleWhileRevalidate(request));
     return;
   }
 
@@ -165,7 +167,10 @@ async function staleWhileRevalidate(request) {
   const cache  = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
 
-  const fetchPromise = fetch(request)
+  // cache: 'no-store' forces an actual network round-trip instead of
+  // letting the browser's own HTTP cache silently return a stale copy
+  // of a file that was replaced under the same filename (e.g. hero.jpg).
+  const fetchPromise = fetch(request, { cache: 'no-store' })
     .then(response => {
       if (response.ok) cache.put(request, response.clone());
       return response;
