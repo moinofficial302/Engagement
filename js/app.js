@@ -206,17 +206,29 @@ function initScratchCard() {
     navigator.vibrate(8);
   }
 
+  let lastCanvasWidth = 0;
+
   function sizeCanvas() {
     const rect = wrapper.getBoundingClientRect();
     // #main-content is display:none behind the envelope, so the very first
     // call (on page load) sees a 0×0 wrapper. Skip painting until we have
     // real dimensions — openEnvelope() calls this again once it's visible.
     if (rect.width === 0 || rect.height === 0) return;
+
+    // Once revealed, never repaint again (a scroll-triggered resize on
+    // mobile — e.g. the address bar showing/hiding — used to wipe out
+    // the player's scratch progress by repainting mid-scratch).
+    if (hasRevealed) return;
+
+    // Only a real size change (like a rotation) should trigger a repaint —
+    // ignore the tiny height wobbles mobile browsers fire while scrolling.
+    if (canvas.width > 0 && Math.abs(rect.width - lastCanvasWidth) < 2) return;
+
+    lastCanvasWidth = rect.width;
     canvas.width  = rect.width;
     canvas.height = rect.height;
     canvas.style.opacity = '1';
     canvas.style.pointerEvents = 'auto';
-    hasRevealed = false;
     paintScratchLayer();
   }
 
@@ -255,6 +267,19 @@ function initScratchCard() {
       ctx.fillStyle = `rgba(120,100,60,${(Math.random() * 0.3 + 0.1).toFixed(2)})`;
       ctx.fill();
     }
+
+    // Embossed "Scratch To Reveal" label on the card
+    ctx.save();
+    const fontSize = Math.max(16, Math.min(w * 0.075, 26));
+    ctx.font = `italic 700 ${fontSize}px Montserrat, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = Math.max(2, fontSize * 0.09);
+    ctx.strokeStyle = 'rgba(80,55,20,0.6)';
+    ctx.strokeText('Scratch To Reveal', w / 2, h / 2);
+    ctx.fillStyle = '#fff8e6';
+    ctx.fillText('Scratch To Reveal', w / 2, h / 2);
+    ctx.restore();
   }
 
   function getPos(e) {
