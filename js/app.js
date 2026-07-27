@@ -214,19 +214,37 @@ function initScratchCard() {
   }
 
   function paintScratchLayer() {
-    // Solid gold/rose "scratch" foil covering the revealed message
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, '#d9c08f');
-    gradient.addColorStop(1, '#c9a96e');
+    const w = canvas.width, h = canvas.height;
+
+    // Glittery pink "foil" — light highlight upper-left fading to deep mauve edges
+    const gradient = ctx.createRadialGradient(w * 0.4, h * 0.38, w * 0.05, w * 0.5, h * 0.5, w * 0.75);
+    gradient.addColorStop(0,    '#f3d7e0');
+    gradient.addColorStop(0.35, '#dba3b8');
+    gradient.addColorStop(0.7,  '#b8607e');
+    gradient.addColorStop(1,    '#8c3f5c');
     ctx.globalCompositeOperation = 'source-over';
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, w, h);
 
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    ctx.font = '600 15px Montserrat, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('✦ Scratch Here ✦', canvas.width / 2, canvas.height / 2);
+    // Light glitter speckles
+    for (let i = 0; i < 320; i++) {
+      const x = Math.random() * w;
+      const y = Math.random() * h;
+      const r = Math.random() * 1.5 + 0.3;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${(Math.random() * 0.5 + 0.15).toFixed(2)})`;
+      ctx.fill();
+    }
+    // A few deeper flecks for depth/texture
+    for (let i = 0; i < 60; i++) {
+      const x = Math.random() * w;
+      const y = Math.random() * h;
+      ctx.beginPath();
+      ctx.arc(x, y, Math.random() * 1.1 + 0.4, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(90,30,50,${(Math.random() * 0.3 + 0.1).toFixed(2)})`;
+      ctx.fill();
+    }
   }
 
   function getPos(e) {
