@@ -11,7 +11,7 @@
 
 'use strict';
 
-const CACHE_NAME    = 'wedding-v1.0.9';
+const CACHE_NAME    = 'wedding-v1.1.1';
 const OFFLINE_PAGE  = 'offline.html';
 
 /* ── Files to pre-cache on install ──
@@ -26,6 +26,8 @@ const PRECACHE_ASSETS = [
   './',
   'index.html',
   'css/style.css',
+  'css/door.css',
+  'css/door-animations.css',
   'js/app.js',
   'js/firebase-config.js',
   'manifest.json',
