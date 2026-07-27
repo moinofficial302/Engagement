@@ -235,50 +235,74 @@ function initScratchCard() {
   function paintScratchLayer() {
     const w = canvas.width, h = canvas.height;
 
-    // Metallic gold + silver foil mix — diagonal blend so both tones read clearly
+    // ── Premium metallic gold foil background ──
+    // Diagonal brushed-gold gradient: deep bronze edges, rich gold body,
+    // one soft bright sweep for that foil-card shine (no silver).
     const gradient = ctx.createLinearGradient(0, 0, w, h);
-    gradient.addColorStop(0,    '#e8d9a8'); // pale gold highlight
-    gradient.addColorStop(0.25, '#c9a96e'); // gold
-    gradient.addColorStop(0.5,  '#e6e6e6'); // silver
-    gradient.addColorStop(0.75, '#b8934a'); // deeper gold
-    gradient.addColorStop(1,    '#d4d4d4'); // silver edge
+    gradient.addColorStop(0,    '#8a6a2e'); // deep bronze
+    gradient.addColorStop(0.22, '#c9a355'); // rich gold
+    gradient.addColorStop(0.48, '#f0dfa0'); // bright gold sweep (the "shine")
+    gradient.addColorStop(0.62, '#c9a355'); // back to rich gold
+    gradient.addColorStop(1,    '#8a6a2e'); // deep bronze
     ctx.globalCompositeOperation = 'source-over';
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, w, h);
 
-    // Light glitter speckles — mix of gold and silver sparkle
-    for (let i = 0; i < 320; i++) {
+    // Very fine brushed-metal grain — subtle, not sparkly/cheap
+    for (let i = 0; i < 140; i++) {
       const x = Math.random() * w;
       const y = Math.random() * h;
-      const r = Math.random() * 1.5 + 0.3;
       ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fillStyle = Math.random() > 0.5
-        ? `rgba(255,255,255,${(Math.random() * 0.6 + 0.2).toFixed(2)})`   // silver sparkle
-        : `rgba(255,223,150,${(Math.random() * 0.5 + 0.15).toFixed(2)})`; // gold sparkle
+      ctx.arc(x, y, Math.random() * 0.8 + 0.2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,244,210,${(Math.random() * 0.12 + 0.03).toFixed(2)})`;
       ctx.fill();
     }
-    // A few deeper flecks for depth/texture
-    for (let i = 0; i < 60; i++) {
+    // A few deeper bronze flecks for depth
+    for (let i = 0; i < 40; i++) {
       const x = Math.random() * w;
       const y = Math.random() * h;
       ctx.beginPath();
-      ctx.arc(x, y, Math.random() * 1.1 + 0.4, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(120,100,60,${(Math.random() * 0.3 + 0.1).toFixed(2)})`;
+      ctx.arc(x, y, Math.random() * 0.9 + 0.3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(90,65,25,${(Math.random() * 0.18 + 0.06).toFixed(2)})`;
       ctx.fill();
     }
 
-    // Embossed "Scratch To Reveal" label on the card
+    // Soft vignette so the edges feel like a real card, not a flat fill
+    const vignette = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.3, w / 2, h / 2, Math.max(w, h) * 0.7);
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(60,42,15,0.28)');
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, w, h);
+
+    // Thin inset frame — reads as a premium card edge
+    const inset = Math.max(6, Math.min(w, h) * 0.035);
+    ctx.strokeStyle = 'rgba(255,244,210,0.5)';
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(inset, inset, w - inset * 2, h - inset * 2);
+
+    // ── Elegant label: serif italic with flanking ornaments ──
     ctx.save();
-    const fontSize = Math.max(16, Math.min(w * 0.075, 26));
-    ctx.font = `italic 700 ${fontSize}px Montserrat, sans-serif`;
+    const fontSize = Math.max(15, Math.min(w * 0.058, 22));
+    ctx.font = `italic 600 ${fontSize}px 'Cormorant Garamond', serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.lineWidth = Math.max(2, fontSize * 0.09);
-    ctx.strokeStyle = 'rgba(80,55,20,0.6)';
-    ctx.strokeText('Scratch To Reveal', w / 2, h / 2);
-    ctx.fillStyle = '#fff8e6';
-    ctx.fillText('Scratch To Reveal', w / 2, h / 2);
+
+    ctx.shadowColor = 'rgba(60,40,10,0.5)';
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetY = 1;
+    ctx.fillStyle = '#fffaf0';
+    ctx.fillText('Scratch to Reveal', w / 2, h / 2);
+    ctx.restore();
+
+    ctx.save();
+    const ornSize = fontSize * 0.55;
+    ctx.font = `${ornSize}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(255,250,240,0.85)';
+    const textHalfWidth = (fontSize * 0.29 * 'Scratch to Reveal'.length) / 2;
+    ctx.fillText('✦', w / 2 - textHalfWidth - ornSize * 1.6, h / 2);
+    ctx.fillText('✦', w / 2 + textHalfWidth + ornSize * 1.6, h / 2);
     ctx.restore();
   }
 
@@ -294,6 +318,11 @@ function initScratchCard() {
   function scratch(e) {
     const { x, y } = getPos(e);
     ctx.globalCompositeOperation = 'destination-out';
+    // Must be a fully-opaque fillStyle — destination-out removes alpha
+    // proportional to the shape's OWN alpha. Without this, a leftover
+    // fillStyle (e.g. the ornament text's 0.85 alpha) meant every scratch
+    // stroke only ever faded the card instead of fully clearing it.
+    ctx.fillStyle = 'rgba(0,0,0,1)';
     ctx.beginPath();
     ctx.arc(x, y, 28, 0, Math.PI * 2);
     ctx.fill();
@@ -308,9 +337,11 @@ function initScratchCard() {
     let transparentPixels = 0;
     const totalPixels = imageData.length / 4;
 
-    // Sample every 4th pixel for performance
+    // Sample every 4th pixel for performance. Allow a small tolerance
+    // (<10) instead of requiring exactly 0 — canvas alpha blending can
+    // leave a rounding residue of 1-2 even on a fully-erased pixel.
     for (let i = 3; i < imageData.length; i += 16) {
-      if (imageData[i] === 0) transparentPixels++;
+      if (imageData[i] < 10) transparentPixels++;
     }
 
     const scratchedRatio = transparentPixels / (totalPixels / 4);
