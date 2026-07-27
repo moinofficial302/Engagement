@@ -108,20 +108,27 @@ function playConfetti() {
 
   container.innerHTML = ''; // clear any previous run
 
-  const player = document.createElement('lottie-player');
-  player.setAttribute('src', 'lottie/confetti-burst.json');
-  player.setAttribute('autoplay', '');
-  player.setAttribute('background', 'transparent');
-  player.setAttribute('speed', '1');
-  container.appendChild(player);
+  const colors = ['#c5768a', '#c9a96e', '#e8b4be', '#8a4560', '#ffffff', '#f5d9df', '#a85870'];
+  const pieceCount = 90;
 
-  // Remove once the animation completes so it doesn't block clicks/scroll
-  player.addEventListener('complete', () => {
-    container.innerHTML = '';
-  });
+  for (let i = 0; i < pieceCount; i++) {
+    const piece = document.createElement('span');
+    piece.className = 'confetti-piece';
+    const size = 6 + Math.random() * 6;
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.width = size + 'px';
+    piece.style.height = size + 'px';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.setProperty('--rot', Math.floor(Math.random() * 360) + 'deg');
+    piece.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+    piece.style.animationDuration = (2.4 + Math.random() * 1.8) + 's';
+    piece.style.animationDelay = (Math.random() * 0.6) + 's';
+    container.appendChild(piece);
+  }
 
-  // Safety fallback in case 'complete' never fires
-  setTimeout(() => { container.innerHTML = ''; }, 4000);
+  // Clean up once the shower has finished falling
+  setTimeout(() => { container.innerHTML = ''; }, 4800);
 }
 
 /* ═══════════════════════════════
@@ -216,24 +223,27 @@ function initScratchCard() {
   function paintScratchLayer() {
     const w = canvas.width, h = canvas.height;
 
-    // Glittery pink "foil" — light highlight upper-left fading to deep mauve edges
-    const gradient = ctx.createRadialGradient(w * 0.4, h * 0.38, w * 0.05, w * 0.5, h * 0.5, w * 0.75);
-    gradient.addColorStop(0,    '#f3d7e0');
-    gradient.addColorStop(0.35, '#dba3b8');
-    gradient.addColorStop(0.7,  '#b8607e');
-    gradient.addColorStop(1,    '#8c3f5c');
+    // Metallic gold + silver foil mix — diagonal blend so both tones read clearly
+    const gradient = ctx.createLinearGradient(0, 0, w, h);
+    gradient.addColorStop(0,    '#e8d9a8'); // pale gold highlight
+    gradient.addColorStop(0.25, '#c9a96e'); // gold
+    gradient.addColorStop(0.5,  '#e6e6e6'); // silver
+    gradient.addColorStop(0.75, '#b8934a'); // deeper gold
+    gradient.addColorStop(1,    '#d4d4d4'); // silver edge
     ctx.globalCompositeOperation = 'source-over';
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, w, h);
 
-    // Light glitter speckles
+    // Light glitter speckles — mix of gold and silver sparkle
     for (let i = 0; i < 320; i++) {
       const x = Math.random() * w;
       const y = Math.random() * h;
       const r = Math.random() * 1.5 + 0.3;
       ctx.beginPath();
       ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${(Math.random() * 0.5 + 0.15).toFixed(2)})`;
+      ctx.fillStyle = Math.random() > 0.5
+        ? `rgba(255,255,255,${(Math.random() * 0.6 + 0.2).toFixed(2)})`   // silver sparkle
+        : `rgba(255,223,150,${(Math.random() * 0.5 + 0.15).toFixed(2)})`; // gold sparkle
       ctx.fill();
     }
     // A few deeper flecks for depth/texture
@@ -242,7 +252,7 @@ function initScratchCard() {
       const y = Math.random() * h;
       ctx.beginPath();
       ctx.arc(x, y, Math.random() * 1.1 + 0.4, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(90,30,50,${(Math.random() * 0.3 + 0.1).toFixed(2)})`;
+      ctx.fillStyle = `rgba(120,100,60,${(Math.random() * 0.3 + 0.1).toFixed(2)})`;
       ctx.fill();
     }
   }
@@ -280,7 +290,7 @@ function initScratchCard() {
 
     const scratchedRatio = transparentPixels / (totalPixels / 4);
 
-    if (scratchedRatio > 0.5) {
+    if (scratchedRatio > 0.75) {
       hasRevealed = true;
       canvas.style.transition = 'opacity 0.6s ease';
       canvas.style.opacity = '0';
@@ -510,8 +520,6 @@ function applySiteContent(data) {
   if (data.venue) {
     setText('venue-name', data.venue.name);
     setText('venue-addr', data.venue.address);
-    const mapBtn = document.getElementById('venue-map-btn');
-    if (mapBtn && data.venue.mapLink) mapBtn.href = data.venue.mapLink;
     updateVenueMapEmbed(data.venue.name, data.venue.address);
   }
 
@@ -560,8 +568,11 @@ function updateVenueMapEmbed(name, address) {
   if (!query) return;
   const embed   = document.getElementById('venue-map-embed');
   const openBtn = document.getElementById('venue-map-open-btn');
+  const mainBtn = document.getElementById('venue-map-btn');
+  const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
   if (embed)   embed.src   = `https://www.google.com/maps?q=${query}&output=embed`;
-  if (openBtn) openBtn.href = `https://www.google.com/maps/search/?api=1&query=${query}`;
+  if (openBtn) openBtn.href = url;
+  if (mainBtn) mainBtn.href = url;
 }
 
 /* ═══════════════════════════════
