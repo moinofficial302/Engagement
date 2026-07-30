@@ -371,6 +371,163 @@ button { font-family: inherit; }
   margin-top: 8px;
 }
 
+/* ─── LIVE PREVIEW (mini mockups of the real site) ─── */
+.live-preview {
+  margin-top: 16px;
+  padding: 14px;
+  background: var(--blush);
+  border: 1px dashed rgba(197,118,138,0.35);
+  border-radius: 10px;
+}
+.live-preview-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--rose-dark);
+  margin-bottom: 10px;
+}
+
+.preview-hero {
+  background: linear-gradient(160deg, #7a3a52 0%, #a85870 55%, #c5768a 100%);
+  border-radius: 10px;
+  padding: 20px 12px;
+  text-align: center;
+  color: white;
+}
+.preview-hero .p-badge {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 10px;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 6px;
+}
+.preview-hero .p-names {
+  font-family: 'Great Vibes', cursive;
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.preview-names-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 10px;
+  text-align: center;
+}
+.preview-names-row .p-fullname {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-dark);
+}
+.preview-names-row .p-role {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--rose);
+  text-transform: uppercase;
+  margin-top: 2px;
+  font-weight: 600;
+}
+.preview-names-row .p-parent {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.preview-scratch {
+  background: linear-gradient(135deg, #f5d98a, #e0a5b8);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+.preview-scratch .p-date {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #211717;
+}
+.preview-scratch .p-sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #6b3a4a;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.preview-venue {
+  text-align: center;
+}
+.preview-venue .p-vname {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--text-dark);
+}
+.preview-venue .p-vaddr {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.preview-timeline-item, .preview-prewedding-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(197,118,138,0.15);
+}
+.preview-timeline-item:last-child, .preview-prewedding-item:last-child { border-bottom: none; }
+.preview-timeline-item .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--rose);
+  margin-top: 5px; flex-shrink: 0;
+}
+.preview-timeline-item .p-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--rose);
+}
+.preview-timeline-item .p-time {
+  font-size: 11px;
+  color: var(--text-light);
+}
+.preview-prewedding-item {
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+}
+.preview-prewedding-item .p-pwname {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--rose);
+}
+.preview-prewedding-item .p-pwdetail {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.preview-invite {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-mid);
+  text-align: center;
+  line-height: 1.7;
+}
+
+.preview-footer {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--rose);
+  text-align: center;
+}
+
 /* Loading spinner */
 .spinner {
   width: 28px; height: 28px;
