@@ -120,7 +120,6 @@ function loadContentIntoEditor() {
       const venue = data.venue || {};
       document.getElementById('c-venue-name').value = venue.name || 'The Grand Palace';
       document.getElementById('c-venue-addr').value = venue.address || '123 Royal Avenue, London';
-      document.getElementById('c-venue-map').value  = venue.mapLink || '';
 
       const timeline = (data.timeline && data.timeline.length) ? data.timeline : [
         { title: 'Guest Arrival', time: '15 Jun 2026 · 4:00 PM' },
@@ -140,6 +139,8 @@ function loadContentIntoEditor() {
       document.getElementById('c-invitation-text').value = data.invitationText ||
         "With hearts full of love and joy, we warmly invite you to share in the celebration of our union. Your presence would mean the world to us as we begin this beautiful journey together.";
       document.getElementById('c-footer-message').value = data.footerMessage || "We can't wait to celebrate with you!";
+
+      initLivePreviews();
     })
     .catch(err => {
       console.error('[Admin] Failed to load content:', err);
@@ -159,7 +160,7 @@ function addTimelineRow(title = '', time = '') {
   const wrap = document.createElement('div');
   wrap.className = 'repeat-item';
   wrap.innerHTML = `
-    <button type="button" class="repeat-remove" onclick="this.parentElement.remove()">✕</button>
+    <button type="button" class="repeat-remove" onclick="this.parentElement.remove(); renderTimelinePreview();">✕</button>
     <div class="form-group">
       <label class="form-label">Event Title</label>
       <input type="text" class="form-input tl-title-input" placeholder="Wedding Ceremony" value="${escapeAttr(title)}">
@@ -170,6 +171,7 @@ function addTimelineRow(title = '', time = '') {
     </div>
   `;
   document.getElementById('timeline-editor').appendChild(wrap);
+  renderTimelinePreview();
 }
 
 /* ── Pre-wedding repeatable rows ── */
@@ -177,7 +179,7 @@ function addPreweddingRow(name = '', detail = '') {
   const wrap = document.createElement('div');
   wrap.className = 'repeat-item';
   wrap.innerHTML = `
-    <button type="button" class="repeat-remove" onclick="this.parentElement.remove()">✕</button>
+    <button type="button" class="repeat-remove" onclick="this.parentElement.remove(); renderPreweddingPreview();">✕</button>
     <div class="form-group">
       <label class="form-label">Event Name</label>
       <input type="text" class="form-input pw-name-input" placeholder="Mehendi" value="${escapeAttr(name)}">
@@ -188,10 +190,138 @@ function addPreweddingRow(name = '', detail = '') {
     </div>
   `;
   document.getElementById('prewedding-editor').appendChild(wrap);
+  renderPreweddingPreview();
 }
 
 function escapeAttr(str) {
   return (str || '').replace(/"/g, '&quot;');
+}
+
+/* ═══════════════════════════════
+   LIVE PREVIEWS
+   Mirrors exactly what the real site does with this data, so editing
+   a field shows its effect immediately — no guessing what will change.
+═══════════════════════════════ */
+function initLivePreviews() {
+  const bind = (id, cb) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', cb);
+  };
+
+  function updateHeroPreview() {
+    document.getElementById('prev-hero-groom').textContent =
+      document.getElementById('c-groom-name').value.trim() || 'Sam';
+    document.getElementById('prev-hero-bride').textContent =
+      document.getElementById('c-bride-name').value.trim() || 'Sofía';
+  }
+
+  function updateNamesPreview() {
+    document.getElementById('prev-groom-fullname').textContent =
+      document.getElementById('c-groom-fullname').value.trim() || 'Sam Kumar';
+    document.getElementById('prev-groom-parent').textContent =
+      document.getElementById('c-groom-parent').value.trim();
+    document.getElementById('prev-bride-fullname').textContent =
+      document.getElementById('c-bride-fullname').value.trim() || 'Sofía Sharma';
+    document.getElementById('prev-bride-parent').textContent =
+      document.getElementById('c-bride-parent').value.trim();
+  }
+
+  function updateDatePreview() {
+    const val = document.getElementById('c-wedding-date').value;
+    if (!val) return;
+    const d = new Date(val);
+    if (isNaN(d)) return;
+    document.getElementById('prev-date-text').textContent =
+      d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
+    const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    document.getElementById('prev-date-sub').textContent = `${dayName} · ${time}`;
+  }
+
+  function updateVenuePreview() {
+    document.getElementById('prev-venue-name').textContent =
+      document.getElementById('c-venue-name').value.trim() || 'The Grand Palace';
+    document.getElementById('prev-venue-addr').textContent =
+      document.getElementById('c-venue-addr').value.trim();
+  }
+
+  function updateInvitePreview() {
+    document.getElementById('prev-invitation-text').textContent =
+      document.getElementById('c-invitation-text').value.trim();
+  }
+
+  function updateFooterPreview() {
+    document.getElementById('prev-footer-message').textContent =
+      document.getElementById('c-footer-message').value.trim() || "We can't wait to celebrate with you!";
+  }
+
+  ['c-groom-name', 'c-bride-name'].forEach(id => bind(id, updateHeroPreview));
+  ['c-groom-fullname', 'c-groom-parent', 'c-bride-fullname', 'c-bride-parent'].forEach(id => bind(id, updateNamesPreview));
+  bind('c-wedding-date', updateDatePreview);
+  ['c-venue-name', 'c-venue-addr'].forEach(id => bind(id, updateVenuePreview));
+  bind('c-invitation-text', updateInvitePreview);
+  bind('c-footer-message', updateFooterPreview);
+
+  const timelineEditor = document.getElementById('timeline-editor');
+  if (timelineEditor) timelineEditor.addEventListener('input', renderTimelinePreview);
+
+  const preweddingEditor = document.getElementById('prewedding-editor');
+  if (preweddingEditor) preweddingEditor.addEventListener('input', renderPreweddingPreview);
+
+  // Sync previews once with whatever values just got loaded
+  updateHeroPreview();
+  updateNamesPreview();
+  updateDatePreview();
+  updateVenuePreview();
+  updateInvitePreview();
+  updateFooterPreview();
+  renderTimelinePreview();
+  renderPreweddingPreview();
+}
+
+function renderTimelinePreview() {
+  const preview = document.getElementById('timeline-preview');
+  if (!preview) return;
+  const rows = Array.from(document.querySelectorAll('#timeline-editor .repeat-item'));
+
+  if (!rows.length) {
+    preview.innerHTML = `<p style="font-size:11px;color:var(--text-light);">Koi item nahi hai abhi</p>`;
+    return;
+  }
+
+  preview.innerHTML = rows.map(row => {
+    const title = row.querySelector('.tl-title-input').value.trim() || '(untitled)';
+    const time  = row.querySelector('.tl-time-input').value.trim();
+    return `
+      <div class="preview-timeline-item">
+        <div class="dot"></div>
+        <div>
+          <div class="p-title">${escapeHTML(title)}</div>
+          <div class="p-time">${escapeHTML(time)}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderPreweddingPreview() {
+  const preview = document.getElementById('prewedding-preview');
+  if (!preview) return;
+  const rows = Array.from(document.querySelectorAll('#prewedding-editor .repeat-item'));
+
+  if (!rows.length) {
+    preview.innerHTML = `<p style="font-size:11px;color:var(--text-light);">Koi event nahi hai abhi</p>`;
+    return;
+  }
+
+  preview.innerHTML = rows.map(row => {
+    const name   = row.querySelector('.pw-name-input').value.trim() || '(untitled)';
+    const detail = row.querySelector('.pw-detail-input').value.trim();
+    return `
+      <div class="preview-prewedding-item">
+        <div class="p-pwname">${escapeHTML(name)}</div>
+        <div class="p-pwdetail">${escapeHTML(detail)}</div>
+      </div>`;
+  }).join('');
 }
 
 /* ── Save everything to Firestore ── */
@@ -225,8 +355,7 @@ function saveContent() {
     weddingDateISO,
     venue: {
       name:    document.getElementById('c-venue-name').value.trim(),
-      address: document.getElementById('c-venue-addr').value.trim(),
-      mapLink: document.getElementById('c-venue-map').value.trim()
+      address: document.getElementById('c-venue-addr').value.trim()
     },
     timeline,
     preWeddingEvents,
