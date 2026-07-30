@@ -194,6 +194,7 @@ function initScratchCard() {
   let isDrawing    = false;
   let hasRevealed  = false;
   let lastVibrateAt = 0;
+  let cssWidth = 0, cssHeight = 0; // logical (CSS) size — what we draw in
 
   // Short, evenly-spaced vibration pulses while scratching feel smoother
   // on a phone than one long buzz. 40ms gap keeps it fluid without
@@ -205,8 +206,6 @@ function initScratchCard() {
     lastVibrateAt = now;
     navigator.vibrate(8);
   }
-
-  let lastCanvasWidth = 0;
 
   function sizeCanvas() {
     const rect = wrapper.getBoundingClientRect();
@@ -222,72 +221,78 @@ function initScratchCard() {
 
     // Only a real size change (like a rotation) should trigger a repaint —
     // ignore the tiny height wobbles mobile browsers fire while scrolling.
-    if (canvas.width > 0 && Math.abs(rect.width - lastCanvasWidth) < 2) return;
+    if (cssWidth > 0 && Math.abs(rect.width - cssWidth) < 2) return;
 
-    lastCanvasWidth = rect.width;
-    canvas.width  = rect.width;
-    canvas.height = rect.height;
+    cssWidth  = rect.width;
+    cssHeight = rect.height;
+
+    // Render at native pixel density (retina/high-DPI phones) so the
+    // texture and text come out crisp instead of blurry/pixelated.
+    // Setting canvas.width/height resets ALL context state, so the
+    // scale transform must be (re)applied right after.
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width  = cssWidth  * dpr;
+    canvas.height = cssHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
     canvas.style.opacity = '1';
     canvas.style.pointerEvents = 'auto';
     paintScratchLayer();
   }
 
   function paintScratchLayer() {
-    const w = canvas.width, h = canvas.height;
+    const w = cssWidth, h = cssHeight; // always draw in logical pixels
 
-    // ── Premium metallic gold foil background ──
-    // Diagonal brushed-gold gradient: deep bronze edges, rich gold body,
-    // one soft bright sweep for that foil-card shine (no silver).
+    // ── Holographic Gold-Rose — iridescent shifting bands ──
     const gradient = ctx.createLinearGradient(0, 0, w, h);
-    gradient.addColorStop(0,    '#8a6a2e'); // deep bronze
-    gradient.addColorStop(0.22, '#c9a355'); // rich gold
-    gradient.addColorStop(0.48, '#f0dfa0'); // bright gold sweep (the "shine")
-    gradient.addColorStop(0.62, '#c9a355'); // back to rich gold
-    gradient.addColorStop(1,    '#8a6a2e'); // deep bronze
+    gradient.addColorStop(0,    '#f5d98a');
+    gradient.addColorStop(0.3,  '#e0a5b8');
+    gradient.addColorStop(0.55, '#d8c46a');
+    gradient.addColorStop(0.8,  '#c98bc4');
+    gradient.addColorStop(1,    '#f0d98a');
     ctx.globalCompositeOperation = 'source-over';
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, w, h);
 
-    // Very fine brushed-metal grain — subtle, not sparkly/cheap
-    for (let i = 0; i < 140; i++) {
+    // Glowing sparkle scattered across the surface
+    const sparkleCount = Math.round((w * h) / 900);
+    for (let i = 0; i < sparkleCount; i++) {
       const x = Math.random() * w;
       const y = Math.random() * h;
+      const r = Math.random() * 1.6 + 0.4;
+      const bright = Math.random() > 0.45;
+      ctx.save();
+      ctx.shadowColor = bright ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.35)';
+      ctx.shadowBlur = r * 3.5;
       ctx.beginPath();
-      ctx.arc(x, y, Math.random() * 0.8 + 0.2, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,244,210,${(Math.random() * 0.12 + 0.03).toFixed(2)})`;
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = bright
+        ? `rgba(255,255,255,${(Math.random() * 0.6 + 0.35).toFixed(2)})`
+        : 'rgba(255,255,255,0.35)';
       ctx.fill();
-    }
-    // A few deeper bronze flecks for depth
-    for (let i = 0; i < 40; i++) {
-      const x = Math.random() * w;
-      const y = Math.random() * h;
-      ctx.beginPath();
-      ctx.arc(x, y, Math.random() * 0.9 + 0.3, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(90,65,25,${(Math.random() * 0.18 + 0.06).toFixed(2)})`;
-      ctx.fill();
+      ctx.restore();
     }
 
     // Soft vignette so the edges feel like a real card, not a flat fill
-    const vignette = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.3, w / 2, h / 2, Math.max(w, h) * 0.7);
+    const vignette = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.4, w / 2, h / 2, Math.max(w, h) * 0.75);
     vignette.addColorStop(0, 'rgba(0,0,0,0)');
-    vignette.addColorStop(1, 'rgba(60,42,15,0.28)');
+    vignette.addColorStop(1, 'rgba(70,30,50,0.18)');
     ctx.fillStyle = vignette;
     ctx.fillRect(0, 0, w, h);
 
     // Thin inset frame — reads as a premium card edge
     const inset = Math.max(6, Math.min(w, h) * 0.035);
-    ctx.strokeStyle = 'rgba(255,244,210,0.5)';
+    ctx.strokeStyle = 'rgba(255,250,235,0.45)';
     ctx.lineWidth = 1.2;
     ctx.strokeRect(inset, inset, w - inset * 2, h - inset * 2);
 
-    // ── Elegant label: serif italic with flanking ornaments ──
+    // ── Label: serif italic with flanking ornaments ──
     ctx.save();
     const fontSize = Math.max(15, Math.min(w * 0.058, 22));
     ctx.font = `italic 600 ${fontSize}px 'Cormorant Garamond', serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-
-    ctx.shadowColor = 'rgba(60,40,10,0.5)';
+    ctx.shadowColor = 'rgba(60,30,40,0.5)';
     ctx.shadowBlur = 3;
     ctx.shadowOffsetY = 1;
     ctx.fillStyle = '#fffaf0';
@@ -309,9 +314,11 @@ function initScratchCard() {
   function getPos(e) {
     const rect = canvas.getBoundingClientRect();
     const point = e.touches ? e.touches[0] : e;
+    // Logical (CSS) pixels — the context's own DPR transform (see
+    // sizeCanvas) handles converting these to the real pixel buffer.
     return {
-      x: (point.clientX - rect.left) * (canvas.width / rect.width),
-      y: (point.clientY - rect.top) * (canvas.height / rect.height)
+      x: point.clientX - rect.left,
+      y: point.clientY - rect.top
     };
   }
 
@@ -333,6 +340,8 @@ function initScratchCard() {
   function checkRevealProgress() {
     if (hasRevealed) return;
 
+    // getImageData reads the REAL pixel buffer (canvas.width/height are
+    // DPR-scaled) — that's fine, we only need a ratio, not absolute counts.
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     let transparentPixels = 0;
     const totalPixels = imageData.length / 4;
@@ -384,6 +393,14 @@ function initScratchCard() {
   window.addEventListener('resize', sizeCanvas);
   scratchResizeFn = sizeCanvas; // openEnvelope() calls this once the card is actually visible
   sizeCanvas(); // no-op right now (wrapper is 0×0 behind the closed envelope)
+
+  // Cormorant Garamond may still be downloading on first paint — once it's
+  // ready, repaint so the label never gets stuck in a fallback font.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      if (!hasRevealed && cssWidth > 0) paintScratchLayer();
+    });
+  }
 }
 
 /* ═══════════════════════════════
