@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -87,6 +88,28 @@
             <input type="text" class="form-input" id="c-bride-parent" placeholder="D/o Mr. Suresh Sharma">
           </div>
         </div>
+
+        <div class="live-preview">
+          <div class="live-preview-label">👁️ Hero section (top banner) me aisa dikhega</div>
+          <div class="preview-hero">
+            <div class="p-badge">We're getting married</div>
+            <div class="p-names"><span id="prev-hero-groom">Sam</span> &amp; <span id="prev-hero-bride">Sofía</span></div>
+          </div>
+
+          <div class="live-preview-label" style="margin-top:14px;">👁️ Names section me aisa dikhega</div>
+          <div class="preview-names-row">
+            <div class="p-side">
+              <div class="p-fullname" id="prev-groom-fullname">Sam Kumar</div>
+              <div class="p-role">Groom</div>
+              <div class="p-parent" id="prev-groom-parent">S/o Mr. Ramesh Kumar</div>
+            </div>
+            <div class="p-side">
+              <div class="p-fullname" id="prev-bride-fullname">Sofía Sharma</div>
+              <div class="p-role">Bride</div>
+              <div class="p-parent" id="prev-bride-parent">D/o Mr. Suresh Sharma</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="editor-card">
@@ -94,6 +117,14 @@
         <div class="form-group">
           <label class="form-label">Date &amp; Time</label>
           <input type="datetime-local" class="form-input" id="c-wedding-date">
+        </div>
+
+        <div class="live-preview">
+          <div class="live-preview-label">👁️ Scratch card aur Countdown timer dono isi se chalte hain</div>
+          <div class="preview-scratch">
+            <div class="p-date" id="prev-date-text">June 15, 2026</div>
+            <div class="p-sub" id="prev-date-sub">Monday · 5:00 PM</div>
+          </div>
         </div>
       </div>
 
@@ -107,9 +138,13 @@
           <label class="form-label">Address</label>
           <input type="text" class="form-input" id="c-venue-addr" placeholder="123 Royal Avenue, London">
         </div>
-        <div class="form-group">
-          <label class="form-label">Google Maps Link</label>
-          <input type="url" class="form-input" id="c-venue-map" placeholder="https://maps.google.com/?q=...">
+
+        <div class="live-preview">
+          <div class="live-preview-label">👁️ Venue section me aisa dikhega (map bhi inhi 2 fields se banta hai)</div>
+          <div class="preview-venue">
+            <div class="p-vname" id="prev-venue-name">The Grand Palace</div>
+            <div class="p-vaddr" id="prev-venue-addr">123 Royal Avenue, London</div>
+          </div>
         </div>
       </div>
 
@@ -117,12 +152,22 @@
         <div class="editor-card-title">🕐 Program Timeline</div>
         <div id="timeline-editor"></div>
         <button type="button" class="add-row-btn" onclick="addTimelineRow()">+ Add Timeline Item</button>
+
+        <div class="live-preview">
+          <div class="live-preview-label">👁️ Program Timeline section me aisa dikhega</div>
+          <div id="timeline-preview"></div>
+        </div>
       </div>
 
       <div class="editor-card">
         <div class="editor-card-title">🎊 Pre-Wedding Events</div>
         <div id="prewedding-editor"></div>
         <button type="button" class="add-row-btn" onclick="addPreweddingRow()">+ Add Event</button>
+
+        <div class="live-preview">
+          <div class="live-preview-label">👁️ Pre-Wedding Events section me aisa dikhega</div>
+          <div id="prewedding-preview"></div>
+        </div>
       </div>
 
       <div class="editor-card">
@@ -130,12 +175,22 @@
         <div class="form-group">
           <textarea class="form-textarea" id="c-invitation-text" placeholder="With hearts full of love..."></textarea>
         </div>
+
+        <div class="live-preview">
+          <div class="live-preview-label">👁️ "With Love" section me aisa dikhega</div>
+          <div class="preview-invite" id="prev-invitation-text">With hearts full of love...</div>
+        </div>
       </div>
 
       <div class="editor-card">
         <div class="editor-card-title">👋 Footer Message</div>
         <div class="form-group">
           <input type="text" class="form-input" id="c-footer-message" placeholder="We can't wait to celebrate with you!">
+        </div>
+
+        <div class="live-preview">
+          <div class="live-preview-label">👁️ Site ke sabse neeche (footer) me aisa dikhega</div>
+          <div class="preview-footer" id="prev-footer-message">We can't wait to celebrate with you!</div>
         </div>
       </div>
 
