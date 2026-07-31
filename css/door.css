@@ -43,14 +43,16 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* Corner gold frame brackets — now double-lined (outer + inner nested line)
-   and 16:9 rectangular (not square), with top-left pushed closer to the top
-   edge and bottom-right pushed closer to the bottom edge.
-   Plus a rich golden dust field (three tiled dot layers of different sizes)
-   for scattered particles across the whole screen, matching the reference. */
+/* Corner gold frame brackets — double-lined (outer + inner nested), 16:9
+   rectangular, top-left near the top edge, bottom-right near the bottom
+   edge. This layer sits ABOVE the doors (z-index 3 > door z-index 2) so
+   it is visible immediately on the closed "tap to open" screen — matching
+   the reference — instead of being hidden behind the doors until they
+   swing open (which was causing it to flash up oddly on its own). */
 #envelope-cover::before {
   content: '';
   position: absolute; inset: 0;
+  pointer-events: none;
   background-image:
     /* top-left bracket — outer line */
     linear-gradient(to right,  rgba(201,169,110,0.85) 1px, transparent 1px),
@@ -67,10 +69,6 @@
     /* faint diagonal texture */
     linear-gradient(45deg,  rgba(255,255,255,0.05) 1px, transparent 1px),
     linear-gradient(-45deg, rgba(255,255,255,0.05) 1px, transparent 1px),
-    /* golden dust — three tiled dot layers, different sizes, faked randomness */
-    radial-gradient(circle, rgba(255,255,255,0.55) 0.8px, transparent 1.3px),
-    radial-gradient(circle, rgba(246,230,194,0.9) 1px, transparent 1.6px),
-    radial-gradient(circle, rgba(255,236,201,0.35) 1.8px, transparent 3px),
     /* vignette */
     radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.22) 100%);
   background-size:
@@ -79,7 +77,6 @@
     60px 1px, 1px 34px,
     60px 1px, 1px 34px,
     40px 40px, 40px 40px,
-    38px 38px, 64px 64px, 150px 150px,
     100% 100%;
   background-position:
     18px 18px, 18px 18px,
@@ -87,7 +84,6 @@
     30px 30px, 30px 30px,
     calc(100% - 30px) calc(100% - 30px), calc(100% - 30px) calc(100% - 30px),
     0 0, 0 0,
-    6px 9px, 12px 30px, 40px 80px,
     0 0;
   background-repeat:
     no-repeat, no-repeat,
@@ -95,9 +91,8 @@
     no-repeat, no-repeat,
     no-repeat, no-repeat,
     repeat, repeat,
-    repeat, repeat, repeat,
     no-repeat;
-  z-index: 0;
+  z-index: 3;
 }
 
 /* Vignette for depth — premium studio-light feel */
@@ -130,8 +125,9 @@
 
 /* ─── 2. AMBIENT SPARKLES ─── */
 /* Floating gold particles, built with box-shadow dots — no extra HTML needed.
-   Spread across the FULL screen height (not just near the button), to match
-   the scattered golden-dust look of the reference screenshot. */
+   Every dot is placed at a manually-chosen irregular offset (never a repeating
+   grid), so it reads as organic scattered dust rather than a mechanical
+   pattern — spread across the FULL screen height to match the reference. */
 .envelope-inner::before,
 .envelope-inner::after {
   content: '';
@@ -148,33 +144,60 @@
 .envelope-inner::before {
   top: 50%; left: 50%;
   box-shadow:
-    -290px -620px 0 -0.5px rgba(255,255,255,0.75),
-     150px -560px 0 -1px   rgba(246,230,194,0.6),
-    -110px -480px 0 -1.3px rgba(255,255,255,0.5),
-     260px -390px 0 -0.5px rgba(246,230,194,0.65),
-    -230px -260px 0 -1px   rgba(255,255,255,0.55),
-     120px  40px  0 -1px   rgba(246,230,194,0.6),
-    -270px  120px 0 -1.3px rgba(255,255,255,0.5),
-     200px  260px 0 -0.5px rgba(246,230,194,0.65),
-    -150px  420px 0 -1px   rgba(255,255,255,0.55),
-     280px  520px 0 -1.3px rgba(246,230,194,0.5),
-    -200px  600px 0 -0.5px rgba(255,255,255,0.6);
+    -310px -740px 0 -0.6px rgba(255,255,255,0.7),
+     130px -700px 0 -1px   rgba(246,230,194,0.55),
+    -70px  -660px 0 -1.4px rgba(255,255,255,0.45),
+     280px -600px 0 -0.6px rgba(246,230,194,0.6),
+    -220px -560px 0 -1px   rgba(255,255,255,0.5),
+     60px  -500px 0 -1.3px rgba(246,230,194,0.55),
+    -160px -440px 0 -0.6px rgba(255,255,255,0.5),
+     240px -390px 0 -1px   rgba(246,230,194,0.6),
+    -290px -320px 0 -1.3px rgba(255,255,255,0.45),
+     110px -260px 0 -0.6px rgba(246,230,194,0.55),
+    -80px  -190px 0 -1px   rgba(255,255,255,0.5),
+     200px -120px 0 -1.3px rgba(246,230,194,0.6),
+    -250px -40px  0 -0.6px rgba(255,255,255,0.5),
+     150px  10px  0 -1px   rgba(246,230,194,0.55),
+    -120px  90px  0 -1.3px rgba(255,255,255,0.5),
+     260px  150px 0 -0.6px rgba(246,230,194,0.6),
+    -200px  230px 0 -1px   rgba(255,255,255,0.5),
+     90px   300px 0 -1.3px rgba(246,230,194,0.55),
+    -270px  360px 0 -0.6px rgba(255,255,255,0.5),
+     190px  430px 0 -1px   rgba(246,230,194,0.6),
+    -140px  500px 0 -1.3px rgba(255,255,255,0.45),
+     240px  560px 0 -0.6px rgba(246,230,194,0.55),
+    -80px   630px 0 -1px   rgba(255,255,255,0.5),
+     130px  700px 0 -1.3px rgba(246,230,194,0.55),
+    -220px  760px 0 -0.6px rgba(255,255,255,0.5);
   animation-delay: 0s;
 }
 .envelope-inner::after {
   top: 50%; left: 50%;
   box-shadow:
-     90px -700px 0 -1px    rgba(255,255,255,0.6),
-    -180px -540px 0 -0.5px rgba(246,230,194,0.55),
-     240px -450px 0 -1.3px rgba(255,255,255,0.5),
-    -100px -330px 0 -0.5px rgba(246,230,194,0.6),
-     190px -150px 0 -1px   rgba(255,255,255,0.5),
-    -260px   10px 0 -1.3px rgba(246,230,194,0.55),
-     140px  180px 0 -0.5px rgba(255,255,255,0.6),
-    -190px  330px 0 -1px   rgba(246,230,194,0.5),
-     260px  460px 0 -1.3px rgba(255,255,255,0.55),
-    -110px  560px 0 -0.5px rgba(246,230,194,0.6),
-     170px  660px 0 -1px   rgba(255,255,255,0.5);
+     100px -760px 0 -1px   rgba(255,255,255,0.55),
+    -190px -690px 0 -0.6px rgba(246,230,194,0.5),
+     250px -630px 0 -1.3px rgba(255,255,255,0.45),
+    -110px -570px 0 -0.6px rgba(246,230,194,0.55),
+     40px  -510px 0 -1px   rgba(255,255,255,0.5),
+    -270px -450px 0 -1.3px rgba(246,230,194,0.5),
+     170px -400px 0 -0.6px rgba(255,255,255,0.55),
+    -60px  -340px 0 -1px   rgba(246,230,194,0.5),
+     230px -270px 0 -1.3px rgba(255,255,255,0.5),
+    -160px -200px 0 -0.6px rgba(246,230,194,0.55),
+     90px  -130px 0 -1px   rgba(255,255,255,0.45),
+    -240px -60px  0 -1.3px rgba(246,230,194,0.5),
+     140px  0px   0 -0.6px rgba(255,255,255,0.55),
+    -100px  70px  0 -1px   rgba(246,230,194,0.5),
+     210px  140px 0 -1.3px rgba(255,255,255,0.5),
+    -180px  210px 0 -0.6px rgba(246,230,194,0.55),
+     60px   280px 0 -1px   rgba(255,255,255,0.5),
+    -260px  350px 0 -1.3px rgba(246,230,194,0.45),
+     150px  420px 0 -0.6px rgba(255,255,255,0.55),
+    -70px   490px 0 -1px   rgba(246,230,194,0.5),
+     220px  550px 0 -1.3px rgba(255,255,255,0.5),
+    -190px  620px 0 -0.6px rgba(246,230,194,0.55),
+     100px  690px 0 -1px   rgba(255,255,255,0.5),
+    -140px  750px 0 -1.3px rgba(246,230,194,0.5);
   animation-delay: 2.4s;
 }
 @keyframes sparkleFloat {
@@ -275,6 +298,13 @@
 #envelope-cover.opening {
   pointer-events: none;
   animation: none;
+  /* The whole cover — doors, corner brackets, dust, vignette — fades out
+     as one unit shortly after the door-rotation finishes (~1.35s), so
+     nothing is ever left showing on its own as a stray "extra screen"
+     before the wedding card appears underneath. */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s ease 1.25s, visibility 0s linear 1.85s;
 }
 
 /* ─── 5. CENTER CONTENT (tap-to-open circle + labels) ─── */
