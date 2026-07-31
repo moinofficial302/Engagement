@@ -24,20 +24,18 @@
   position: fixed; inset: 0;
   z-index: 1000;
   overflow: hidden;
-  /* Darkened ~40% vs the earlier version + a soft vertical light beam
-     down the center, to match the reference look. All static layers —
-     nothing here animates, which is what was causing the stutter.
+  /* Base color palette kept exactly as requested — untouched.
      Diagonal texture + vignette are folded in here too now, since the
-     ::before pseudo-element is needed for the new glowing arch frame. */
+     ::before pseudo-element is needed for the new glowing arch frame.
+     The old vertical light-beam design element has been removed. */
   background-image:
-    radial-gradient(ellipse 90px 100% at 50% 50%, rgba(255,238,205,0.28), transparent 70%),
     radial-gradient(ellipse at 50% 15%, rgba(255,255,255,0.06) 0%, transparent 50%),
     linear-gradient(45deg,  rgba(255,255,255,0.05) 1px, transparent 1px),
     linear-gradient(-45deg, rgba(255,255,255,0.05) 1px, transparent 1px),
     radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.22) 100%),
     linear-gradient(160deg, #38121f 0%, #4a1f30 30%, #63293e 60%, #7a3a52 100%);
-  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px, 100% 100%, 100% 100%;
-  background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat, no-repeat;
+  background-size: 100% 100%, 40px 40px, 40px 40px, 100% 100%, 100% 100%;
+  background-repeat: no-repeat, repeat, repeat, no-repeat, no-repeat;
   animation: coverEntrance 1s cubic-bezier(0.22, 1, 0.36, 1);
   perspective: 1600px;
   perspective-origin: 50% 50%;
@@ -73,8 +71,25 @@
     drop-shadow(0 0 6px  rgba(255,214,150,0.6))
     drop-shadow(0 0 16px rgba(255,195,120,0.45))
     drop-shadow(0 0 34px rgba(255,180,100,0.25));
+  animation: archGlow 4.5s ease-in-out infinite;
   pointer-events: none;
   z-index: 3;
+}
+
+/* Slow, subtle glow breathing on the arch — quiet living neon feel */
+@keyframes archGlow {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 6px  rgba(255,214,150,0.6))
+      drop-shadow(0 0 16px rgba(255,195,120,0.45))
+      drop-shadow(0 0 34px rgba(255,180,100,0.25));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 9px  rgba(255,214,150,0.75))
+      drop-shadow(0 0 22px rgba(255,195,120,0.55))
+      drop-shadow(0 0 44px rgba(255,180,100,0.32));
+  }
 }
 
 /* Vignette for depth — premium studio-light feel */
@@ -513,6 +528,7 @@
 /* ─── 9. REDUCED MOTION SUPPORT ─── */
 @media (prefers-reduced-motion: reduce) {
   #envelope-cover,
+  #envelope-cover::before,
   #envelope-cover::after,
   .door-left, .door-right,
   .envelope-inner::before, .envelope-inner::after,
