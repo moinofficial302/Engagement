@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════
-   door.css
+   door.css — PREMIUM VERSION
    Everything for the opening experience: from the closed
    "Tap to Open" screen, through the door-opening animation,
    to arriving on the main invitation page.
@@ -9,11 +9,14 @@
 
    Sections:
    1. Envelope Cover (background + pattern + glow burst)
-   2. Door Panels (the two swinging halves)
-   3. Door Open Animation (rotateY)
-   4. Center Content (tap-to-open circle, labels)
-   5. Pulse Animation (glow ring on the tap button)
-   6. Main Content Reveal (fade in once doors open)
+   2. Ambient Sparkles (floating gold particles)
+   3. Door Panels (the two swinging halves)
+   4. Door Open Animation (rotateY)
+   5. Center Content (tap-to-open circle, labels)
+   6. Tap Button — Rotating Gold Ring + Pulse
+   7. Shimmer Text
+   8. Main Content Reveal (cinematic fade+scale in)
+   9. Reduced Motion Support
 ═══════════════════════════════════════════════════ */
 
 /* ─── 1. ENVELOPE COVER ─── */
@@ -21,8 +24,10 @@
   position: fixed; inset: 0;
   z-index: 1000;
   overflow: hidden;
-  background: linear-gradient(160deg, #7a3a52 0%, #a85870 55%, #c5768a 100%);
-  perspective: 1400px;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.10) 0%, transparent 55%),
+    linear-gradient(160deg, #5e2740 0%, #7a3a52 30%, #a85870 60%, #c5768a 100%);
+  perspective: 1600px;
   perspective-origin: 50% 50%;
   cursor: pointer;
 }
@@ -32,33 +37,86 @@
   content: '';
   position: absolute; inset: 0;
   background-image:
-    linear-gradient(45deg,  rgba(255,255,255,0.07) 1px, transparent 1px),
-    linear-gradient(-45deg, rgba(255,255,255,0.07) 1px, transparent 1px);
+    linear-gradient(45deg,  rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(255,255,255,0.06) 1px, transparent 1px);
   background-size: 40px 40px;
   z-index: 0;
 }
+
+/* Vignette for depth — premium studio-light feel */
+#envelope-cover .env-vignette,
+#envelope-cover::marker { display: none; }
 
 /* Glow Burst — blooms outward from the center as the doors part */
 #envelope-cover::after {
   content: '';
   position: absolute; top: 50%; left: 50%;
   width: 0; height: 0;
-  background: radial-gradient(circle, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 70%);
+  background: radial-gradient(circle,
+    rgba(255,255,255,0.65) 0%,
+    rgba(255,236,201,0.35) 35%,
+    rgba(201,169,110,0) 70%);
   transform: translate(-50%, -50%);
   z-index: 1;
   opacity: 0;
-  transition: width 1.1s ease, height 1.1s ease, opacity 1.1s ease;
+  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+              height 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 1s ease;
 }
 #envelope-cover.opening::after {
-  width: 900px; height: 900px;
+  width: 1100px; height: 1100px;
   opacity: 1;
 }
 
-/* ─── 2. DOOR PANELS ─── */
+/* ─── 2. AMBIENT SPARKLES ─── */
+/* Floating gold particles, built with box-shadow dots — no extra HTML needed */
+.envelope-inner::before,
+.envelope-inner::after {
+  content: '';
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #f6e6c2;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 4px rgba(246,230,194,0.9));
+  animation: sparkleFloat 6s ease-in-out infinite;
+}
+.envelope-inner::before {
+  top: 22%; left: 28%;
+  box-shadow:
+    120px 40px 0 -1px rgba(255,255,255,0.7),
+    -60px 90px 0 -1px rgba(246,230,194,0.6),
+    180px 150px 0 -2px rgba(255,255,255,0.5),
+    -140px -30px 0 -1px rgba(246,230,194,0.55);
+  animation-delay: 0s;
+}
+.envelope-inner::after {
+  top: 65%; left: 62%;
+  box-shadow:
+    -160px -70px 0 -1px rgba(255,255,255,0.6),
+    90px -140px 0 -2px rgba(246,230,194,0.55),
+    -80px 60px 0 -1px rgba(255,255,255,0.45),
+    140px 20px 0 -1px rgba(246,230,194,0.6);
+  animation-delay: 2.4s;
+}
+@keyframes sparkleFloat {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
+  50%      { transform: translateY(-14px) scale(1.3); opacity: 1; }
+}
+#envelope-cover.opening .envelope-inner::before,
+#envelope-cover.opening .envelope-inner::after {
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+/* ─── 3. DOOR PANELS ─── */
 .door-left, .door-right {
   position: absolute; top: 0; bottom: 0;
   width: 50%;
-  background: linear-gradient(160deg, #7a3a52 0%, #a85870 55%, #c5768a 100%);
+  background:
+    linear-gradient(160deg, #5e2740 0%, #7a3a52 30%, #a85870 60%, #c5768a 100%);
   z-index: 2;
   will-change: transform;
   backface-visibility: hidden;
@@ -67,14 +125,16 @@
 .door-left {
   left: 0;
   transform-origin: left center;
-  box-shadow: inset -3px 0 12px rgba(255,255,255,0.15);
-  transition: transform 1.3s cubic-bezier(0.86, 0, 0.07, 1);
+  box-shadow: inset -4px 0 16px rgba(255,255,255,0.18);
+  transition: transform 1.35s cubic-bezier(0.76, 0, 0.24, 1),
+              box-shadow 1.35s ease;
 }
 .door-right {
   right: 0;
   transform-origin: right center;
-  box-shadow: inset 3px 0 12px rgba(255,255,255,0.15);
-  transition: transform 1.3s cubic-bezier(0.86, 0, 0.07, 1);
+  box-shadow: inset 4px 0 16px rgba(255,255,255,0.18);
+  transition: transform 1.35s cubic-bezier(0.76, 0, 0.24, 1) 0.06s,
+              box-shadow 1.35s ease;
 }
 
 /* Subtle pattern repeated on each door panel */
@@ -87,39 +147,49 @@
   background-size: 40px 40px;
 }
 
-/* Gold edge lines — form the center seam when doors are closed */
+/* Gold edge lines with soft shimmer sweep — hints at interactivity while closed */
 .door-left::after {
   content: '';
   position: absolute; top: 0; right: 0; bottom: 0;
   width: 2px;
-  background: linear-gradient(to bottom, transparent, #c9a96e 15%, #c9a96e 85%, transparent);
+  background: linear-gradient(to bottom, transparent, #e4c98a 15%, #c9a96e 85%, transparent);
+  box-shadow: 0 0 8px rgba(228,201,138,0.6);
 }
 .door-right::after {
   content: '';
   position: absolute; top: 0; left: 0; bottom: 0;
   width: 2px;
-  background: linear-gradient(to bottom, transparent, #c9a96e 15%, #c9a96e 85%, transparent);
+  background: linear-gradient(to bottom, transparent, #e4c98a 15%, #c9a96e 85%, transparent);
+  box-shadow: 0 0 8px rgba(228,201,138,0.6);
 }
 
 .door-center-line { display: none; }
 
-/* ─── 3. DOOR OPEN ANIMATION (rotateY) ─── */
-#envelope-cover.opening .door-left  { transform: rotateY(-100deg) scale(0.97); }
-#envelope-cover.opening .door-right { transform: rotateY(100deg) scale(0.97); }
+/* ─── 4. DOOR OPEN ANIMATION (rotateY) ─── */
+#envelope-cover.opening .door-left {
+  transform: rotateY(-105deg) scale(0.96);
+  box-shadow: inset -20px 0 40px rgba(0,0,0,0.35);
+}
+#envelope-cover.opening .door-right {
+  transform: rotateY(105deg) scale(0.96);
+  box-shadow: inset 20px 0 40px rgba(0,0,0,0.35);
+}
 #envelope-cover.opening .door-center-line,
 #envelope-cover.opening .envelope-inner {
   opacity: 0;
-  transition: opacity 0.15s;
+  transform: scale(0.9);
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 #envelope-cover.opening { pointer-events: none; }
 
-/* ─── 4. CENTER CONTENT (tap-to-open circle + labels) ─── */
+/* ─── 5. CENTER CONTENT (tap-to-open circle + labels) ─── */
 .envelope-inner {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
   flex-direction: column;
   z-index: 10;
   pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .env-card {
@@ -129,6 +199,11 @@
   pointer-events: all;
   position: relative;
   z-index: 10;
+  animation: cardSettle 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes cardSettle {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .env-label {
@@ -141,8 +216,10 @@
   text-transform: uppercase;
   margin-bottom: 36px;
   display: block;
+  text-shadow: 0 0 12px rgba(255,255,255,0.35);
 }
 
+/* ─── 6. TAP BUTTON — ROTATING GOLD RING + PULSE ─── */
 .tap-btn {
   width: 110px; height: 110px;
   background: linear-gradient(145deg, #ffffff, #fdf1f4);
@@ -150,13 +227,42 @@
   display: flex; align-items: center; justify-content: center;
   flex-direction: column;
   margin: 0 auto 20px;
-  border: 2px solid #c9a96e;
+  position: relative;
+  border: 2px solid transparent;
+  background-clip: padding-box;
   box-shadow:
     0 0 0 6px  rgba(255,255,255,0.25),
     0 0 0 12px rgba(255,255,255,0.12),
-    0 8px 30px rgba(90,30,50,0.35);
-  animation: pulse 2.5s ease-in-out infinite;
+    0 10px 34px rgba(90,30,50,0.4);
+  animation: pulse 2.5s ease-in-out infinite, floatBtn 3.6s ease-in-out infinite;
   cursor: pointer;
+  transition: transform 0.25s ease;
+}
+.tap-btn:active {
+  transform: scale(0.94);
+}
+
+/* Rotating conic-gradient gold ring, sits just outside the button */
+.tap-btn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  padding: 2px;
+  background: conic-gradient(from 0deg, #c9a96e, #f6e6c2, #c9a96e, #7a5a34, #c9a96e);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spinRing 4s linear infinite;
+  z-index: -1;
+}
+
+@keyframes spinRing {
+  to { transform: rotate(360deg); }
+}
+@keyframes floatBtn {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
 }
 
 .w-letter {
@@ -182,25 +288,42 @@
   text-transform: uppercase;
   font-weight: 400;
   margin-top: 4px;
+  position: relative;
+  display: inline-block;
 }
 
-/* ─── 5. PULSE ANIMATION (glow ring on tap button) ─── */
+/* ─── 7. SHIMMER TEXT — subtle light sweep across "tap to open" ─── */
+.tap-text::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -60%;
+  width: 40%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.85), transparent);
+  animation: shimmerSweep 3.2s ease-in-out infinite;
+}
+@keyframes shimmerSweep {
+  0%   { left: -60%; }
+  55%  { left: 130%; }
+  100% { left: 130%; }
+}
+
+/* ─── PULSE ANIMATION (glow ring on tap button) ─── */
 @keyframes pulse {
   0%, 100% {
     box-shadow:
       0 0 0 6px  rgba(255,255,255,0.25),
       0 0 0 12px rgba(255,255,255,0.12),
-      0 8px 30px rgba(90,30,50,0.35);
+      0 10px 34px rgba(90,30,50,0.4);
   }
   50% {
     box-shadow:
-      0 0 0 10px rgba(255,255,255,0.32),
-      0 0 0 20px rgba(255,255,255,0.15),
-      0 8px 30px rgba(90,30,50,0.35);
+      0 0 0 11px rgba(255,255,255,0.32),
+      0 0 0 22px rgba(255,255,255,0.14),
+      0 10px 34px rgba(90,30,50,0.4);
   }
 }
 
-/* ─── 6. MAIN CONTENT REVEAL (arriving at the card page) ─── */
+/* ─── 8. MAIN CONTENT REVEAL (cinematic fade + scale + blur) ─── */
 #main-content {
   display: none;
   opacity: 0;
@@ -208,9 +331,24 @@
 }
 #main-content.visible {
   display: block;
-  animation: fadeInUp 0.8s ease forwards;
+  animation: fadeInUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(34px) scale(0.985); filter: blur(6px); }
+  60%  { filter: blur(0); }
+  to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* ─── 9. REDUCED MOTION SUPPORT ─── */
+@media (prefers-reduced-motion: reduce) {
+  #envelope-cover::after,
+  .door-left, .door-right,
+  .envelope-inner::before, .envelope-inner::after,
+  .tap-btn, .tap-btn::before,
+  .tap-text::after,
+  .env-card,
+  #main-content.visible {
+    animation: none !important;
+    transition-duration: 0.2s !important;
+  }
 }
