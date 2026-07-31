@@ -64,11 +64,15 @@
   border: 2.5px solid rgba(247,222,175,0.95);
   border-bottom: none;
   border-radius: 50% 50% 0 0 / 38% 38% 0 0;
-  box-shadow:
-    0 0 10px  rgba(255,214,150,0.55),
-    0 0 26px  rgba(255,195,120,0.4),
-    0 0 48px  rgba(255,180,100,0.22);
-  filter: drop-shadow(0 0 14px rgba(255,205,140,0.35));
+  /* Only drop-shadow here (not box-shadow) — box-shadow glows around the
+     FULL box shape even on sides with no visible border, which was
+     drawing an unwanted glowing line across the open bottom and making
+     it look like a closed, boxed-in shape. drop-shadow only glows where
+     there is actually a rendered line, so the bottom stays properly open. */
+  filter:
+    drop-shadow(0 0 6px  rgba(255,214,150,0.6))
+    drop-shadow(0 0 16px rgba(255,195,120,0.45))
+    drop-shadow(0 0 34px rgba(255,180,100,0.25));
   pointer-events: none;
   z-index: 3;
 }
