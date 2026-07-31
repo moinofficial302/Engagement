@@ -24,11 +24,14 @@
   position: fixed; inset: 0;
   z-index: 1000;
   overflow: hidden;
+  /* Darkened ~40% vs the earlier version + a soft vertical light beam
+     down the center, to match the reference look. All static layers —
+     nothing here animates, which is what was causing the stutter. */
   background:
-    radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.10) 0%, transparent 55%),
-    linear-gradient(160deg, #5e2740 0%, #7a3a52 30%, #a85870 60%, #c5768a 100%);
-  background-size: 100% 100%, 220% 220%;
-  animation: coverEntrance 1s cubic-bezier(0.22, 1, 0.36, 1), livingGradient 14s ease-in-out infinite;
+    radial-gradient(ellipse 90px 100% at 50% 50%, rgba(255,238,205,0.28), transparent 70%),
+    radial-gradient(ellipse at 50% 15%, rgba(255,255,255,0.06) 0%, transparent 50%),
+    linear-gradient(160deg, #38121f 0%, #4a1f30 30%, #63293e 60%, #7a3a52 100%);
+  animation: coverEntrance 1s cubic-bezier(0.22, 1, 0.36, 1);
   perspective: 1600px;
   perspective-origin: 50% 50%;
   cursor: pointer;
@@ -40,21 +43,26 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* Slow, subtle drift of the background gradient — a "living silk" feel */
-@keyframes livingGradient {
-  0%, 100% { background-position: 0% 0%, 20% 30%; }
-  50%      { background-position: 0% 0%, 80% 70%; }
-}
-
-/* Subtle diagonal pattern background */
+/* Subtle diagonal pattern + corner gold frame brackets (top-left & bottom-right,
+   matching the reference design) — all static, no per-frame repaint cost */
 #envelope-cover::before {
   content: '';
   position: absolute; inset: 0;
   background-image:
-    linear-gradient(45deg,  rgba(255,255,255,0.06) 1px, transparent 1px),
-    linear-gradient(-45deg, rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(to right,  rgba(201,169,110,0.8) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(201,169,110,0.8) 1px, transparent 1px),
+    linear-gradient(to left,   rgba(201,169,110,0.8) 1px, transparent 1px),
+    linear-gradient(to top,    rgba(201,169,110,0.8) 1px, transparent 1px),
+    linear-gradient(45deg,  rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(255,255,255,0.05) 1px, transparent 1px),
     radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.22) 100%);
-  background-size: 40px 40px, 40px 40px, 100% 100%;
+  background-size:
+    60px 1px, 1px 60px, 60px 1px, 1px 60px,
+    40px 40px, 40px 40px, 100% 100%;
+  background-position:
+    28px 28px, 28px 28px, calc(100% - 28px) calc(100% - 28px), calc(100% - 28px) calc(100% - 28px),
+    0 0, 0 0, 0 0;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
   z-index: 0;
 }
 
@@ -62,24 +70,27 @@
 #envelope-cover .env-vignette,
 #envelope-cover::marker { display: none; }
 
-/* Glow Burst — blooms outward from the center as the doors part */
+/* Glow Burst — blooms outward from the center as the doors part.
+   Uses transform:scale (GPU-composited) instead of animating width/height,
+   which was the main cause of the stutter during the door-opening transition. */
 #envelope-cover::after {
   content: '';
   position: absolute; top: 50%; left: 50%;
-  width: 0; height: 0;
+  width: 1100px; height: 1100px;
+  margin: -550px 0 0 -550px;
   background: radial-gradient(circle,
     rgba(255,255,255,0.65) 0%,
     rgba(255,236,201,0.35) 35%,
     rgba(201,169,110,0) 70%);
-  transform: translate(-50%, -50%);
+  transform: scale(0);
+  will-change: transform, opacity;
   z-index: 1;
   opacity: 0;
-  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1),
-              height 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1),
               opacity 1s ease;
 }
 #envelope-cover.opening::after {
-  width: 1100px; height: 1100px;
+  transform: scale(1);
   opacity: 1;
 }
 
@@ -131,7 +142,7 @@
   position: absolute; top: 0; bottom: 0;
   width: 50%;
   background:
-    linear-gradient(160deg, #5e2740 0%, #7a3a52 30%, #a85870 60%, #c5768a 100%);
+    linear-gradient(160deg, #38121f 0%, #4a1f30 30%, #63293e 60%, #7a3a52 100%);
   z-index: 2;
   will-change: transform;
   backface-visibility: hidden;
@@ -141,16 +152,14 @@
   left: 0;
   transform-origin: left center;
   box-shadow: inset -4px 0 16px rgba(255,255,255,0.18);
-  transition: transform 1.35s cubic-bezier(0.76, 0, 0.24, 1),
-              box-shadow 1.35s ease;
+  transition: transform 1.35s cubic-bezier(0.76, 0, 0.24, 1);
   animation: doorBreathe 5s ease-in-out infinite;
 }
 .door-right {
   right: 0;
   transform-origin: right center;
   box-shadow: inset 4px 0 16px rgba(255,255,255,0.18);
-  transition: transform 1.35s cubic-bezier(0.76, 0, 0.24, 1) 0.06s,
-              box-shadow 1.35s ease;
+  transition: transform 1.35s cubic-bezier(0.76, 0, 0.24, 1) 0.06s;
   animation: doorBreathe 5s ease-in-out infinite 1.4s;
 }
 
@@ -271,20 +280,20 @@
   font-style: italic;
   font-weight: 500;
   font-size: 15px;
-  color: white;
+  color: #f3e2c0;
   letter-spacing: 4px;
   text-transform: uppercase;
   margin-bottom: 36px;
   display: block;
-  text-shadow: 0 0 12px rgba(255,255,255,0.35);
+  text-shadow: 0 0 14px rgba(246,230,194,0.45);
   position: relative;
   animation: letterBreathe 6s ease-in-out infinite;
 }
 
 /* Very slow letter-spacing breathing — gives the title a quiet, living elegance */
 @keyframes letterBreathe {
-  0%, 100% { letter-spacing: 4px;   text-shadow: 0 0 12px rgba(255,255,255,0.35); }
-  50%      { letter-spacing: 5.5px; text-shadow: 0 0 20px rgba(255,255,255,0.55); }
+  0%, 100% { letter-spacing: 4px;   text-shadow: 0 0 14px rgba(246,230,194,0.45); }
+  50%      { letter-spacing: 5.5px; text-shadow: 0 0 22px rgba(246,230,194,0.65); }
 }
 
 /* Small ornamental flourish under the title — diamond + two hairlines,
@@ -315,9 +324,9 @@
   border: 2px solid transparent;
   background-clip: padding-box;
   box-shadow:
-    0 0 0 6px  rgba(255,255,255,0.25),
-    0 0 0 12px rgba(255,255,255,0.12),
-    0 10px 34px rgba(90,30,50,0.4);
+    0 0 0 6px  rgba(228,201,138,0.30),
+    0 0 0 13px rgba(228,201,138,0.15),
+    0 10px 34px rgba(50,15,25,0.45);
   animation: pulse 2.5s ease-in-out infinite, floatBtn 3.6s ease-in-out infinite;
   cursor: pointer;
   transition: transform 0.25s ease;
@@ -384,7 +393,7 @@
 .tap-text {
   font-size: 10px;
   letter-spacing: 3px;
-  color: white;
+  color: #f3e2c0;
   text-transform: uppercase;
   font-weight: 400;
   margin-top: 4px;
@@ -411,15 +420,15 @@
 @keyframes pulse {
   0%, 100% {
     box-shadow:
-      0 0 0 6px  rgba(255,255,255,0.25),
-      0 0 0 12px rgba(255,255,255,0.12),
-      0 10px 34px rgba(90,30,50,0.4);
+      0 0 0 6px  rgba(228,201,138,0.30),
+      0 0 0 13px rgba(228,201,138,0.15),
+      0 10px 34px rgba(50,15,25,0.45);
   }
   50% {
     box-shadow:
-      0 0 0 11px rgba(255,255,255,0.32),
-      0 0 0 22px rgba(255,255,255,0.14),
-      0 10px 34px rgba(90,30,50,0.4);
+      0 0 0 11px rgba(228,201,138,0.38),
+      0 0 0 23px rgba(228,201,138,0.18),
+      0 10px 34px rgba(50,15,25,0.45);
   }
 }
 
