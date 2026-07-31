@@ -27,9 +27,23 @@
   background:
     radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.10) 0%, transparent 55%),
     linear-gradient(160deg, #5e2740 0%, #7a3a52 30%, #a85870 60%, #c5768a 100%);
+  background-size: 100% 100%, 220% 220%;
+  animation: coverEntrance 1s cubic-bezier(0.22, 1, 0.36, 1), livingGradient 14s ease-in-out infinite;
   perspective: 1600px;
   perspective-origin: 50% 50%;
   cursor: pointer;
+}
+
+/* Whole screen gently scales/fades in the instant it mounts */
+@keyframes coverEntrance {
+  from { opacity: 0; transform: scale(1.03); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Slow, subtle drift of the background gradient — a "living silk" feel */
+@keyframes livingGradient {
+  0%, 100% { background-position: 0% 0%, 20% 30%; }
+  50%      { background-position: 0% 0%, 80% 70%; }
 }
 
 /* Subtle diagonal pattern background */
@@ -38,8 +52,9 @@
   position: absolute; inset: 0;
   background-image:
     linear-gradient(45deg,  rgba(255,255,255,0.06) 1px, transparent 1px),
-    linear-gradient(-45deg, rgba(255,255,255,0.06) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(-45deg, rgba(255,255,255,0.06) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.22) 100%);
+  background-size: 40px 40px, 40px 40px, 100% 100%;
   z-index: 0;
 }
 
@@ -128,6 +143,7 @@
   box-shadow: inset -4px 0 16px rgba(255,255,255,0.18);
   transition: transform 1.35s cubic-bezier(0.76, 0, 0.24, 1),
               box-shadow 1.35s ease;
+  animation: doorBreathe 5s ease-in-out infinite;
 }
 .door-right {
   right: 0;
@@ -135,6 +151,17 @@
   box-shadow: inset 4px 0 16px rgba(255,255,255,0.18);
   transition: transform 1.35s cubic-bezier(0.76, 0, 0.24, 1) 0.06s,
               box-shadow 1.35s ease;
+  animation: doorBreathe 5s ease-in-out infinite 1.4s;
+}
+
+/* Very soft brightness breathing — like light drifting across satin */
+@keyframes doorBreathe {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.06); }
+}
+#envelope-cover.opening .door-left,
+#envelope-cover.opening .door-right {
+  animation: none;
 }
 
 /* Subtle pattern repeated on each door panel */
@@ -147,20 +174,26 @@
   background-size: 40px 40px;
 }
 
-/* Gold edge lines with soft shimmer sweep — hints at interactivity while closed */
+/* Gold edge accents — kept only near the very top & bottom corners.
+   Masked to fully disappear across the middle band where the title,
+   tap-button and label sit, so nothing ever crosses the text. */
 .door-left::after {
   content: '';
   position: absolute; top: 0; right: 0; bottom: 0;
-  width: 2px;
-  background: linear-gradient(to bottom, transparent, #e4c98a 15%, #c9a96e 85%, transparent);
-  box-shadow: 0 0 8px rgba(228,201,138,0.6);
+  width: 1.5px;
+  background: linear-gradient(to bottom, transparent, #e4c98a 8%, transparent 24%, transparent 76%, #e4c98a 92%, transparent);
+  opacity: 0.55;
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 20%, transparent 34%, transparent 66%, black 80%, black 100%);
+  mask-image: linear-gradient(to bottom, black 0%, black 20%, transparent 34%, transparent 66%, black 80%, black 100%);
 }
 .door-right::after {
   content: '';
   position: absolute; top: 0; left: 0; bottom: 0;
-  width: 2px;
-  background: linear-gradient(to bottom, transparent, #e4c98a 15%, #c9a96e 85%, transparent);
-  box-shadow: 0 0 8px rgba(228,201,138,0.6);
+  width: 1.5px;
+  background: linear-gradient(to bottom, transparent, #e4c98a 8%, transparent 24%, transparent 76%, #e4c98a 92%, transparent);
+  opacity: 0.55;
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 20%, transparent 34%, transparent 66%, black 80%, black 100%);
+  mask-image: linear-gradient(to bottom, black 0%, black 20%, transparent 34%, transparent 66%, black 80%, black 100%);
 }
 
 .door-center-line { display: none; }
@@ -180,7 +213,10 @@
   transform: scale(0.9);
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
-#envelope-cover.opening { pointer-events: none; }
+#envelope-cover.opening {
+  pointer-events: none;
+  animation: none;
+}
 
 /* ─── 5. CENTER CONTENT (tap-to-open circle + labels) ─── */
 .envelope-inner {
@@ -206,6 +242,30 @@
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* Fine gold corner brackets framing the whole card — classic invitation motif.
+   Fade in slightly after the card settles, for a graceful reveal. */
+.env-card::before, .env-card::after {
+  content: '';
+  position: absolute;
+  width: 22px; height: 22px;
+  opacity: 0;
+  animation: cornerFadeIn 1s ease forwards 0.6s;
+}
+.env-card::before {
+  top: -6px; left: -6px;
+  border-top: 1.5px solid rgba(228,201,138,0.85);
+  border-left: 1.5px solid rgba(228,201,138,0.85);
+}
+.env-card::after {
+  bottom: -6px; right: -6px;
+  border-bottom: 1.5px solid rgba(228,201,138,0.85);
+  border-right: 1.5px solid rgba(228,201,138,0.85);
+}
+@keyframes cornerFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 .env-label {
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
@@ -217,6 +277,30 @@
   margin-bottom: 36px;
   display: block;
   text-shadow: 0 0 12px rgba(255,255,255,0.35);
+  position: relative;
+  animation: letterBreathe 6s ease-in-out infinite;
+}
+
+/* Very slow letter-spacing breathing — gives the title a quiet, living elegance */
+@keyframes letterBreathe {
+  0%, 100% { letter-spacing: 4px;   text-shadow: 0 0 12px rgba(255,255,255,0.35); }
+  50%      { letter-spacing: 5.5px; text-shadow: 0 0 20px rgba(255,255,255,0.55); }
+}
+
+/* Small ornamental flourish under the title — diamond + two hairlines,
+   replaces a plain divider line with a more refined motif */
+.env-label::after {
+  content: '';
+  display: block;
+  width: 8px; height: 8px;
+  margin: 14px auto 0;
+  background: linear-gradient(135deg, #f6e6c2, #c9a96e);
+  transform: rotate(45deg);
+  box-shadow:
+    26px 0 0 -3px rgba(228,201,138,0.7),
+    -26px 0 0 -3px rgba(228,201,138,0.7),
+    50px 0 0 -4.3px rgba(228,201,138,0.4),
+    -50px 0 0 -4.3px rgba(228,201,138,0.4);
 }
 
 /* ─── 6. TAP BUTTON — ROTATING GOLD RING + PULSE ─── */
@@ -255,6 +339,22 @@
   mask-composite: exclude;
   animation: spinRing 4s linear infinite;
   z-index: -1;
+}
+
+/* Slow sonar ring — expands outward and fades, looping softly behind the button */
+.tap-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(228,201,138,0.7);
+  animation: sonarPing 3s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  z-index: -2;
+}
+
+@keyframes sonarPing {
+  0%   { transform: scale(1);   opacity: 0.65; }
+  100% { transform: scale(1.9); opacity: 0; }
 }
 
 @keyframes spinRing {
@@ -341,12 +441,14 @@
 
 /* ─── 9. REDUCED MOTION SUPPORT ─── */
 @media (prefers-reduced-motion: reduce) {
+  #envelope-cover,
   #envelope-cover::after,
   .door-left, .door-right,
   .envelope-inner::before, .envelope-inner::after,
-  .tap-btn, .tap-btn::before,
+  .tap-btn, .tap-btn::before, .tap-btn::after,
   .tap-text::after,
-  .env-card,
+  .env-card, .env-card::before, .env-card::after,
+  .env-label,
   #main-content.visible {
     animation: none !important;
     transition-duration: 0.2s !important;
