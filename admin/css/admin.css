@@ -1,42 +1,58 @@
 /* ═══════════════════════════════════════════════════
    ADMIN PANEL — admin.css
-   Palette (matches the wedding site):
-   Navy #0a1628 · Rose #c5768a · Rose-dark #a85870
-   Gold #c9a96e · Cream #fdf8f5 · Blush #f5ede8
+   Palette: Purple #7b4de8 · Blue #4a5de8 · Light Blue #eef1fb
+   White · Yellow #ffc107 · Black #14142b
+
+   NOTE: the "Live Preview" mockups (.preview-*) intentionally use
+   the WEDDING SITE's own rose/gold colors (--site-*), NOT this
+   admin theme — they show admins exactly how the public site looks,
+   which stays pink regardless of the admin panel's own theme.
 ═══════════════════════════════════════════════════ */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --navy:       #0a1628;
-  --navy-2:     #0d1f3c;
-  --rose:       #c5768a;
-  --rose-dark:  #a85870;
-  --gold:       #c9a96e;
-  --cream:      #fdf8f5;
-  --blush:      #f5ede8;
-  --text-dark:  #291d1d;
-  --text-mid:   #553f3f;
-  --text-light: #7b6565;
-  --ok:         #3d8b5f;
-  --ok-bg:      #e7f4ec;
-  --no:         #b3413a;
-  --no-bg:      #fbeae9;
+  /* Admin panel's own theme */
+  --p-blue:     #4a5de8;
+  --p-purple:   #7b4de8;
+  --p-gradient: linear-gradient(135deg, #4a5de8 0%, #7b4de8 100%);
+  --bg-light:   #eef1fb;
+  --card-white: #ffffff;
+  --black:      #14142b;
+  --text-mid:   #4b5563;
+  --text-light: #8b93a7;
+  --yellow:     #ffc107;
+  --yellow-bg:  #fff8e1;
+  --border-soft: rgba(74,93,232,0.15);
+
+  /* RSVP status colors (functional — unrelated to theme) */
+  --ok:         #2e9e63;
+  --ok-bg:      #e5f7ec;
+  --no:         #e5484d;
+  --no-bg:      #fdeceb;
   --maybe:      #b8860b;
   --maybe-bg:   #faf1dd;
+
+  /* Wedding SITE's own colors — used only in .preview-* mockups below,
+     so the "live preview" stays accurate to the real (pink) site */
+  --site-rose:       #c5768a;
+  --site-rose-dark:  #a85870;
+  --site-gold:       #c9a96e;
+  --site-text-dark:  #211717;
+  --site-text-light: #625151;
 }
 
 html { -webkit-text-size-adjust: 100%; }
 body {
   font-family: 'Montserrat', sans-serif;
-  color: var(--text-dark);
-  background: var(--cream);
+  color: var(--black);
+  background: var(--bg-light);
   -webkit-font-smoothing: antialiased;
 }
-::selection { background: var(--rose); color: white; }
-a { color: var(--rose-dark); }
+::selection { background: var(--p-purple); color: white; }
+a { color: var(--p-blue); }
 button { font-family: inherit; }
-:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--p-purple); outline-offset: 2px; }
 
 /* ─── LOGIN PAGE ─── */
 .login-body {
@@ -44,56 +60,49 @@ button { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--navy);
-  background-image:
-    linear-gradient(45deg,  rgba(201,169,110,0.06) 1px, transparent 1px),
-    linear-gradient(-45deg, rgba(201,169,110,0.06) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background: var(--p-gradient);
   padding: 24px;
 }
 .login-card {
   width: 100%;
   max-width: 340px;
-  background: linear-gradient(145deg, var(--navy-2), #16294c);
-  border: 1px solid var(--gold);
+  background: var(--card-white);
   border-radius: 20px;
   padding: 40px 28px;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  box-shadow: 0 20px 60px rgba(20,20,43,0.35);
 }
 .login-emblem {
   width: 60px; height: 60px;
   margin: 0 auto 16px;
   border-radius: 50%;
-  border: 2px solid var(--gold);
+  background: var(--p-gradient);
   display: flex; align-items: center; justify-content: center;
-  color: var(--rose);
+  color: white;
   font-size: 24px;
 }
 .login-title {
-  font-family: 'Great Vibes', cursive;
-  font-size: 34px;
-  color: var(--gold);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  color: var(--black);
   margin-bottom: 2px;
 }
 .login-sub {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
   font-size: 13px;
-  color: rgba(255,255,255,0.6);
-  letter-spacing: 1px;
+  color: var(--text-light);
+  letter-spacing: 0.5px;
   margin-bottom: 28px;
 }
-.login-body .form-label { color: rgba(255,255,255,0.75); }
 .login-body .form-input {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(201,169,110,0.35);
-  color: white;
+  background: var(--bg-light);
+  border-color: var(--border-soft);
+  color: var(--black);
 }
-.login-body .form-input::placeholder { color: rgba(255,255,255,0.35); }
-.login-body .form-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,169,110,0.15); }
+.login-body .form-input::placeholder { color: var(--text-light); }
+.login-body .form-input:focus { border-color: var(--p-purple); box-shadow: 0 0 0 3px rgba(123,77,232,0.15); }
 .login-error {
-  color: #ff8a80;
+  color: var(--no);
   font-size: 12px;
   min-height: 16px;
   margin: 4px 0 14px;
@@ -113,18 +122,18 @@ button { font-family: inherit; }
 .form-input, .form-select, .form-textarea {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid rgba(197,118,138,0.3);
+  border: 1px solid var(--border-soft);
   border-radius: 10px;
   font-size: 14px;
   font-family: inherit;
-  color: var(--text-dark);
+  color: var(--black);
   background: white;
   outline: none;
   transition: border-color .2s, box-shadow .2s;
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus {
-  border-color: var(--rose);
-  box-shadow: 0 0 0 3px rgba(197,118,138,0.12);
+  border-color: var(--p-purple);
+  box-shadow: 0 0 0 3px rgba(123,77,232,0.12);
 }
 .form-textarea { resize: vertical; min-height: 80px; }
 .form-row { display: flex; gap: 12px; }
@@ -132,7 +141,7 @@ button { font-family: inherit; }
 
 .btn-primary {
   width: 100%;
-  background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+  background: var(--p-gradient);
   color: white;
   border: none;
   padding: 14px;
@@ -141,7 +150,7 @@ button { font-family: inherit; }
   font-weight: 600;
   letter-spacing: 0.5px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(197,118,138,0.35);
+  box-shadow: 0 4px 15px rgba(74,93,232,0.35);
   transition: transform .15s;
 }
 .btn-primary:active { transform: scale(0.98); }
@@ -149,8 +158,8 @@ button { font-family: inherit; }
 
 .btn-secondary {
   background: white;
-  color: var(--rose-dark);
-  border: 1px solid var(--rose);
+  color: var(--p-purple);
+  border: 1px solid var(--p-purple);
   padding: 10px 16px;
   border-radius: 8px;
   font-size: 13px;
@@ -160,7 +169,7 @@ button { font-family: inherit; }
 .btn-danger {
   background: var(--no-bg);
   color: var(--no);
-  border: 1px solid rgba(179,65,58,0.3);
+  border: 1px solid rgba(229,72,77,0.3);
   padding: 8px 14px;
   border-radius: 8px;
   font-size: 12px;
@@ -169,7 +178,7 @@ button { font-family: inherit; }
 }
 .btn-ghost {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1px solid rgba(255,255,255,0.35);
   color: white;
   padding: 8px 16px;
   border-radius: 20px;
@@ -179,29 +188,30 @@ button { font-family: inherit; }
 
 /* ─── DASHBOARD SHELL ─── */
 .dash-header {
-  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+  background: var(--black);
   color: white;
   padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
 }
 .dash-title {
-  font-family: 'Great Vibes', cursive;
-  font-size: 26px;
-  color: var(--gold);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: white;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.dash-title .heart { color: var(--rose); font-size: 16px; }
+.dash-title .heart { color: var(--yellow); font-size: 16px; }
 
 .dash-tabs {
   display: flex;
   background: white;
-  border-bottom: 1px solid rgba(197,118,138,0.15);
+  border-bottom: 1px solid var(--border-soft);
   position: sticky; top: 61px; z-index: 99;
   overflow-x: auto;
 }
@@ -220,8 +230,8 @@ button { font-family: inherit; }
   white-space: nowrap;
 }
 .dash-tab.active {
-  color: var(--rose-dark);
-  border-bottom-color: var(--rose);
+  color: var(--p-purple);
+  border-bottom-color: var(--p-purple);
 }
 
 .dash-content { padding: 20px 16px 60px; max-width: 640px; margin: 0 auto; }
@@ -230,10 +240,9 @@ button { font-family: inherit; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .section-heading {
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 600;
-  font-size: 20px;
-  color: var(--text-dark);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--black);
   margin: 24px 0 12px;
 }
 .section-heading:first-child { margin-top: 0; }
@@ -250,17 +259,17 @@ button { font-family: inherit; }
   border-radius: 12px;
   padding: 12px 8px;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(197,118,138,0.08);
-  border: 1px solid rgba(197,118,138,0.1);
+  box-shadow: 0 2px 10px rgba(74,93,232,0.08);
+  border: 1px solid var(--border-soft);
 }
-.summary-num { font-size: 20px; font-weight: 700; color: var(--text-dark); display: block; }
+.summary-num { font-size: 20px; font-weight: 700; color: var(--black); display: block; }
 .summary-label { font-size: 10px; color: var(--text-light); text-transform: uppercase; letter-spacing: .5px; }
 
 .filter-row { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; }
 .filter-chip {
   padding: 7px 14px;
   border-radius: 20px;
-  border: 1px solid rgba(197,118,138,0.3);
+  border: 1px solid var(--border-soft);
   background: white;
   font-size: 12px;
   font-weight: 500;
@@ -268,19 +277,19 @@ button { font-family: inherit; }
   cursor: pointer;
   white-space: nowrap;
 }
-.filter-chip.active { background: var(--rose); color: white; border-color: var(--rose); }
+.filter-chip.active { background: var(--p-gradient); color: white; border-color: transparent; }
 
 .rsvp-card {
   background: white;
   border-radius: 14px;
   padding: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 12px rgba(197,118,138,0.08);
-  border: 1px solid rgba(197,118,138,0.1);
+  box-shadow: 0 2px 12px rgba(74,93,232,0.08);
+  border: 1px solid var(--border-soft);
 }
 .rsvp-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
-.rsvp-name { font-weight: 600; font-size: 15px; color: var(--text-dark); }
-.rsvp-phone { font-size: 12px; color: var(--rose-dark); text-decoration: none; }
+.rsvp-name { font-weight: 600; font-size: 15px; color: var(--black); }
+.rsvp-phone { font-size: 12px; color: var(--p-blue); text-decoration: none; }
 .rsvp-badge {
   font-size: 10px;
   font-weight: 700;
@@ -311,15 +320,15 @@ button { font-family: inherit; }
   border-radius: 14px;
   padding: 18px;
   margin-bottom: 16px;
-  border: 1px solid rgba(197,118,138,0.1);
-  box-shadow: 0 2px 10px rgba(197,118,138,0.06);
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 2px 10px rgba(74,93,232,0.06);
 }
 .editor-card-title {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--rose-dark);
+  color: var(--p-purple);
   margin-bottom: 14px;
   display: flex;
   align-items: center;
@@ -327,7 +336,7 @@ button { font-family: inherit; }
 }
 
 .repeat-item {
-  border: 1px dashed rgba(197,118,138,0.3);
+  border: 1px dashed var(--border-soft);
   border-radius: 10px;
   padding: 12px;
   margin-bottom: 10px;
@@ -347,9 +356,9 @@ button { font-family: inherit; }
 .add-row-btn {
   width: 100%;
   padding: 10px;
-  border: 1px dashed var(--rose);
-  background: var(--blush);
-  color: var(--rose-dark);
+  border: 1px dashed var(--p-purple);
+  background: var(--bg-light);
+  color: var(--p-purple);
   border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
@@ -360,7 +369,7 @@ button { font-family: inherit; }
 .save-bar {
   position: sticky;
   bottom: 0;
-  background: linear-gradient(to top, var(--cream) 60%, transparent);
+  background: linear-gradient(to top, var(--bg-light) 60%, transparent);
   padding: 16px 0 0;
 }
 .save-status {
@@ -371,12 +380,14 @@ button { font-family: inherit; }
   margin-top: 8px;
 }
 
-/* ─── LIVE PREVIEW (mini mockups of the real site) ─── */
+/* ─── LIVE PREVIEW (mini mockups of the real, pink wedding site) ───
+   These deliberately use --site-* colors, not the admin theme above,
+   so the preview stays accurate to what guests actually see. */
 .live-preview {
   margin-top: 16px;
   padding: 14px;
-  background: var(--blush);
-  border: 1px dashed rgba(197,118,138,0.35);
+  background: var(--bg-light);
+  border: 1px dashed rgba(74,93,232,0.3);
   border-radius: 10px;
 }
 .live-preview-label {
@@ -384,7 +395,7 @@ button { font-family: inherit; }
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--rose-dark);
+  color: var(--p-purple);
   margin-bottom: 10px;
 }
 
@@ -418,12 +429,12 @@ button { font-family: inherit; }
   font-family: 'Cormorant Garamond', serif;
   font-weight: 600;
   font-size: 15px;
-  color: var(--text-dark);
+  color: var(--site-text-dark);
 }
 .preview-names-row .p-role {
   font-size: 9px;
   letter-spacing: 1px;
-  color: var(--rose);
+  color: var(--site-rose);
   text-transform: uppercase;
   margin-top: 2px;
   font-weight: 600;
@@ -431,7 +442,7 @@ button { font-family: inherit; }
 .preview-names-row .p-parent {
   font-size: 11px;
   font-style: italic;
-  color: var(--text-light);
+  color: var(--site-text-light);
   margin-top: 2px;
 }
 
@@ -445,7 +456,7 @@ button { font-family: inherit; }
   font-family: 'Cormorant Garamond', serif;
   font-weight: 700;
   font-size: 17px;
-  color: #211717;
+  color: var(--site-text-dark);
 }
 .preview-scratch .p-sub {
   font-size: 10px;
@@ -463,11 +474,11 @@ button { font-family: inherit; }
   font-family: 'Cormorant Garamond', serif;
   font-weight: 600;
   font-size: 17px;
-  color: var(--text-dark);
+  color: var(--site-text-dark);
 }
 .preview-venue .p-vaddr {
   font-size: 12px;
-  color: var(--text-light);
+  color: var(--site-text-light);
   margin-top: 2px;
 }
 
@@ -481,18 +492,18 @@ button { font-family: inherit; }
 .preview-timeline-item:last-child, .preview-prewedding-item:last-child { border-bottom: none; }
 .preview-timeline-item .dot {
   width: 6px; height: 6px; border-radius: 50%;
-  background: var(--rose);
+  background: var(--site-rose);
   margin-top: 5px; flex-shrink: 0;
 }
 .preview-timeline-item .p-title {
   font-family: 'Cormorant Garamond', serif;
   font-weight: 600;
   font-size: 13px;
-  color: var(--rose);
+  color: var(--site-rose);
 }
 .preview-timeline-item .p-time {
   font-size: 11px;
-  color: var(--text-light);
+  color: var(--site-text-light);
 }
 .preview-prewedding-item {
   flex-direction: column;
@@ -503,11 +514,11 @@ button { font-family: inherit; }
   font-family: 'Cormorant Garamond', serif;
   font-weight: 600;
   font-size: 15px;
-  color: var(--rose);
+  color: var(--site-rose);
 }
 .preview-prewedding-item .p-pwdetail {
   font-size: 11px;
-  color: var(--text-light);
+  color: var(--site-text-light);
   margin-top: 2px;
 }
 
@@ -515,7 +526,7 @@ button { font-family: inherit; }
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
   font-size: 13px;
-  color: var(--text-mid);
+  color: var(--site-text-light);
   text-align: center;
   line-height: 1.7;
 }
@@ -524,15 +535,15 @@ button { font-family: inherit; }
   font-family: 'Cormorant Garamond', serif;
   font-weight: 600;
   font-size: 17px;
-  color: var(--rose);
+  color: var(--site-rose);
   text-align: center;
 }
 
 /* Loading spinner */
 .spinner {
   width: 28px; height: 28px;
-  border: 3px solid rgba(197,118,138,0.2);
-  border-top-color: var(--rose);
+  border: 3px solid rgba(74,93,232,0.15);
+  border-top-color: var(--p-purple);
   border-radius: 50%;
   animation: spin .7s linear infinite;
   margin: 40px auto;
@@ -547,7 +558,7 @@ button { font-family: inherit; }
   display: none;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(135deg, var(--gold), #b8934a);
+  background: var(--p-gradient);
   color: white;
   border: none;
   padding: 12px 18px;
@@ -556,7 +567,7 @@ button { font-family: inherit; }
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 20px rgba(20,20,43,0.3);
   cursor: pointer;
 }
 .install-btn.show { display: flex; animation: fadeIn .4s ease; }
@@ -569,3 +580,4 @@ button { font-family: inherit; }
   display: none;
 }
 .login-body .install-btn.show { display: inline-flex; }
+   
