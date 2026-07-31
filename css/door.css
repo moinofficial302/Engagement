@@ -43,26 +43,60 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* Subtle diagonal pattern + corner gold frame brackets (top-left & bottom-right,
-   matching the reference design) — all static, no per-frame repaint cost */
+/* Corner gold frame brackets — now double-lined (outer + inner nested line)
+   and 16:9 rectangular (not square), with top-left pushed closer to the top
+   edge and bottom-right pushed closer to the bottom edge.
+   Plus a rich golden dust field (three tiled dot layers of different sizes)
+   for scattered particles across the whole screen, matching the reference. */
 #envelope-cover::before {
   content: '';
   position: absolute; inset: 0;
   background-image:
-    linear-gradient(to right,  rgba(201,169,110,0.8) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(201,169,110,0.8) 1px, transparent 1px),
-    linear-gradient(to left,   rgba(201,169,110,0.8) 1px, transparent 1px),
-    linear-gradient(to top,    rgba(201,169,110,0.8) 1px, transparent 1px),
+    /* top-left bracket — outer line */
+    linear-gradient(to right,  rgba(201,169,110,0.85) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(201,169,110,0.85) 1px, transparent 1px),
+    /* bottom-right bracket — outer line */
+    linear-gradient(to left,   rgba(201,169,110,0.85) 1px, transparent 1px),
+    linear-gradient(to top,    rgba(201,169,110,0.85) 1px, transparent 1px),
+    /* top-left bracket — inner nested line (double-L) */
+    linear-gradient(to right,  rgba(201,169,110,0.5) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(201,169,110,0.5) 1px, transparent 1px),
+    /* bottom-right bracket — inner nested line (double-L) */
+    linear-gradient(to left,   rgba(201,169,110,0.5) 1px, transparent 1px),
+    linear-gradient(to top,    rgba(201,169,110,0.5) 1px, transparent 1px),
+    /* faint diagonal texture */
     linear-gradient(45deg,  rgba(255,255,255,0.05) 1px, transparent 1px),
     linear-gradient(-45deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+    /* golden dust — three tiled dot layers, different sizes, faked randomness */
+    radial-gradient(circle, rgba(255,255,255,0.55) 0.8px, transparent 1.3px),
+    radial-gradient(circle, rgba(246,230,194,0.9) 1px, transparent 1.6px),
+    radial-gradient(circle, rgba(255,236,201,0.35) 1.8px, transparent 3px),
+    /* vignette */
     radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.22) 100%);
   background-size:
-    60px 1px, 1px 60px, 60px 1px, 1px 60px,
-    40px 40px, 40px 40px, 100% 100%;
+    80px 1px, 1px 45px,
+    80px 1px, 1px 45px,
+    60px 1px, 1px 34px,
+    60px 1px, 1px 34px,
+    40px 40px, 40px 40px,
+    38px 38px, 64px 64px, 150px 150px,
+    100% 100%;
   background-position:
-    28px 28px, 28px 28px, calc(100% - 28px) calc(100% - 28px), calc(100% - 28px) calc(100% - 28px),
-    0 0, 0 0, 0 0;
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
+    18px 18px, 18px 18px,
+    calc(100% - 18px) calc(100% - 18px), calc(100% - 18px) calc(100% - 18px),
+    30px 30px, 30px 30px,
+    calc(100% - 30px) calc(100% - 30px), calc(100% - 30px) calc(100% - 30px),
+    0 0, 0 0,
+    6px 9px, 12px 30px, 40px 80px,
+    0 0;
+  background-repeat:
+    no-repeat, no-repeat,
+    no-repeat, no-repeat,
+    no-repeat, no-repeat,
+    no-repeat, no-repeat,
+    repeat, repeat,
+    repeat, repeat, repeat,
+    no-repeat;
   z-index: 0;
 }
 
@@ -95,36 +129,52 @@
 }
 
 /* ─── 2. AMBIENT SPARKLES ─── */
-/* Floating gold particles, built with box-shadow dots — no extra HTML needed */
+/* Floating gold particles, built with box-shadow dots — no extra HTML needed.
+   Spread across the FULL screen height (not just near the button), to match
+   the scattered golden-dust look of the reference screenshot. */
 .envelope-inner::before,
 .envelope-inner::after {
   content: '';
   position: absolute;
-  width: 4px; height: 4px;
+  width: 3px; height: 3px;
   border-radius: 50%;
   background: #f6e6c2;
   z-index: 5;
   pointer-events: none;
   opacity: 0.85;
-  filter: drop-shadow(0 0 4px rgba(246,230,194,0.9));
+  filter: drop-shadow(0 0 3px rgba(246,230,194,0.9));
   animation: sparkleFloat 6s ease-in-out infinite;
 }
 .envelope-inner::before {
-  top: 22%; left: 28%;
+  top: 50%; left: 50%;
   box-shadow:
-    120px 40px 0 -1px rgba(255,255,255,0.7),
-    -60px 90px 0 -1px rgba(246,230,194,0.6),
-    180px 150px 0 -2px rgba(255,255,255,0.5),
-    -140px -30px 0 -1px rgba(246,230,194,0.55);
+    -290px -620px 0 -0.5px rgba(255,255,255,0.75),
+     150px -560px 0 -1px   rgba(246,230,194,0.6),
+    -110px -480px 0 -1.3px rgba(255,255,255,0.5),
+     260px -390px 0 -0.5px rgba(246,230,194,0.65),
+    -230px -260px 0 -1px   rgba(255,255,255,0.55),
+     120px  40px  0 -1px   rgba(246,230,194,0.6),
+    -270px  120px 0 -1.3px rgba(255,255,255,0.5),
+     200px  260px 0 -0.5px rgba(246,230,194,0.65),
+    -150px  420px 0 -1px   rgba(255,255,255,0.55),
+     280px  520px 0 -1.3px rgba(246,230,194,0.5),
+    -200px  600px 0 -0.5px rgba(255,255,255,0.6);
   animation-delay: 0s;
 }
 .envelope-inner::after {
-  top: 65%; left: 62%;
+  top: 50%; left: 50%;
   box-shadow:
-    -160px -70px 0 -1px rgba(255,255,255,0.6),
-    90px -140px 0 -2px rgba(246,230,194,0.55),
-    -80px 60px 0 -1px rgba(255,255,255,0.45),
-    140px 20px 0 -1px rgba(246,230,194,0.6);
+     90px -700px 0 -1px    rgba(255,255,255,0.6),
+    -180px -540px 0 -0.5px rgba(246,230,194,0.55),
+     240px -450px 0 -1.3px rgba(255,255,255,0.5),
+    -100px -330px 0 -0.5px rgba(246,230,194,0.6),
+     190px -150px 0 -1px   rgba(255,255,255,0.5),
+    -260px   10px 0 -1.3px rgba(246,230,194,0.55),
+     140px  180px 0 -0.5px rgba(255,255,255,0.6),
+    -190px  330px 0 -1px   rgba(246,230,194,0.5),
+     260px  460px 0 -1.3px rgba(255,255,255,0.55),
+    -110px  560px 0 -0.5px rgba(246,230,194,0.6),
+     170px  660px 0 -1px   rgba(255,255,255,0.5);
   animation-delay: 2.4s;
 }
 @keyframes sparkleFloat {
