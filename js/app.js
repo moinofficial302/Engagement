@@ -609,6 +609,7 @@ function applySiteContent(data) {
           </div>
         </div>
       `).join('');
+      applyStaggerIndexes('timeline-list');
     }
   }
 
@@ -622,6 +623,7 @@ function applySiteContent(data) {
           <div class="pw-detail">${escapeHTML(item.detail)}</div>
         </div>
       `).join('');
+      applyStaggerIndexes('prewedding-list');
     }
   }
 
@@ -649,6 +651,65 @@ function updateVenueMapEmbed(name, address) {
 }
 
 /* ═══════════════════════════════
+   10. SCROLL REVEAL + PARALLAX
+   Premium polish: sections fade+lift into view as the guest scrolls,
+   list items stagger in one after another, and the hero photo drifts
+   slightly slower than the page for a subtle depth effect.
+═══════════════════════════════ */
+function initScrollReveal() {
+  const targets = document.querySelectorAll('.reveal-on-scroll');
+  if (!targets.length) return;
+
+  if (!('IntersectionObserver' in window)) {
+    // No IO support — just show everything immediately, no animation
+    targets.forEach(el => el.classList.add('revealed'));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+  targets.forEach(el => observer.observe(el));
+}
+
+function applyStaggerIndexes(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  Array.from(container.children).forEach((child, i) => {
+    child.style.setProperty('--stagger-index', i);
+  });
+}
+
+function initHeroParallax() {
+  const heroImg = document.querySelector('.hero-img');
+  const hero = document.querySelector('.hero');
+  if (!heroImg || !hero) return;
+
+  let ticking = false;
+  function update() {
+    const rect = hero.getBoundingClientRect();
+    // Only move the image while the hero is at least partly on screen
+    if (rect.bottom > 0 && rect.top < window.innerHeight) {
+      const offset = rect.top * -0.15; // slower than scroll = parallax depth
+      heroImg.style.transform = `translateY(${offset}px)`;
+    }
+    ticking = false;
+  }
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(update);
+      ticking = true;
+    }
+  }, { passive: true });
+}
+
+/* ═══════════════════════════════
    INIT — things that don't depend
    on the envelope being opened
 ═══════════════════════════════ */
@@ -656,4 +717,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initScratchCard();
   startCountdown(); // fallback date; upgraded by loadSiteContent() below once Firestore responds
   loadSiteContent();
+  initScrollReveal();
+  initHeroParallax();
+  applyStaggerIndexes('timeline-list');
+  applyStaggerIndexes('prewedding-list');
 });
