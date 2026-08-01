@@ -97,6 +97,7 @@
 #envelope-cover::marker { display: none; }
 
 /* Glow Burst — blooms outward from the center as the doors part.
+   Now layered with soft sunburst rays for a more dramatic reveal.
    Uses transform:scale (GPU-composited) instead of animating width/height,
    which was the main cause of the stutter during the door-opening transition. */
 #envelope-cover::after {
@@ -104,19 +105,24 @@
   position: absolute; top: 50%; left: 50%;
   width: 1100px; height: 1100px;
   margin: -550px 0 0 -550px;
-  background: radial-gradient(circle,
-    rgba(255,255,255,0.65) 0%,
-    rgba(255,236,201,0.35) 35%,
-    rgba(201,169,110,0) 70%);
-  transform: scale(0);
+  background:
+    radial-gradient(circle,
+      rgba(255,255,255,0.65) 0%,
+      rgba(255,236,201,0.35) 35%,
+      rgba(201,169,110,0) 70%),
+    repeating-conic-gradient(
+      from 0deg,
+      rgba(255,246,222,0.22) 0deg 4deg,
+      transparent 4deg 16deg);
+  transform: scale(0) rotate(0deg);
   will-change: transform, opacity;
   z-index: 1;
   opacity: 0;
-  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+  transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1),
               opacity 1s ease;
 }
 #envelope-cover.opening::after {
-  transform: scale(1);
+  transform: scale(1) rotate(14deg);
   opacity: 1;
 }
 
@@ -198,12 +204,12 @@
   animation-delay: 2.4s;
 }
 @keyframes sparkleFloat {
-  0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
-  50%      { transform: translateY(-14px) scale(1.3); opacity: 1; }
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  50%      { transform: translate(4px, -14px) scale(1.3); opacity: 1; }
 }
 #envelope-cover.opening .envelope-inner::before,
 #envelope-cover.opening .envelope-inner::after {
-  transition: opacity 0.3s ease;
+  transition: opacity 0.45s ease;
   opacity: 0;
 }
 
@@ -222,14 +228,14 @@
   left: 0;
   transform-origin: left center;
   box-shadow: inset -4px 0 16px rgba(255,255,255,0.18);
-  transition: transform 1.35s cubic-bezier(0.76, 0, 0.24, 1);
+  transition: transform 1.35s cubic-bezier(0.83, 0, 0.17, 1);
   animation: doorBreathe 5s ease-in-out infinite;
 }
 .door-right {
   right: 0;
   transform-origin: right center;
   box-shadow: inset 4px 0 16px rgba(255,255,255,0.18);
-  transition: transform 1.35s cubic-bezier(0.76, 0, 0.24, 1) 0.06s;
+  transition: transform 1.35s cubic-bezier(0.83, 0, 0.17, 1) 0.06s;
   animation: doorBreathe 5s ease-in-out infinite 1.4s;
 }
 
@@ -321,7 +327,8 @@
   pointer-events: all;
   position: relative;
   z-index: 10;
-  animation: cardSettle 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0;
+  animation: cardSettle 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.7s;
 }
 @keyframes cardSettle {
   from { opacity: 0; transform: translateY(14px) scale(0.96); }
@@ -335,7 +342,7 @@
   position: absolute;
   width: 22px; height: 22px;
   opacity: 0;
-  animation: cornerFadeIn 1s ease forwards 0.6s;
+  animation: cornerFadeIn 1s ease forwards 1.3s;
 }
 .env-card::before {
   top: -6px; left: -6px;
@@ -364,7 +371,15 @@
   display: block;
   text-shadow: 0 0 14px rgba(246,230,194,0.45);
   position: relative;
-  animation: letterBreathe 6s ease-in-out infinite;
+  opacity: 0;
+  animation: titleEntrance 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+             letterBreathe 6s ease-in-out infinite 0.9s;
+}
+
+/* Title drops in first, slightly before the button settles below it */
+@keyframes titleEntrance {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Very slow letter-spacing breathing — gives the title a quiet, living elegance */
@@ -374,19 +389,26 @@
 }
 
 /* Small ornamental flourish under the title — diamond + two hairlines,
-   replaces a plain divider line with a more refined motif */
+   replaces a plain divider line with a more refined motif.
+   Fades in just after the title, continuing the staggered entrance. */
 .env-label::after {
   content: '';
   display: block;
   width: 8px; height: 8px;
   margin: 14px auto 0;
   background: linear-gradient(135deg, #f6e6c2, #c9a96e);
-  transform: rotate(45deg);
+  transform: rotate(45deg) scale(0);
+  opacity: 0;
+  animation: ornamentPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.5s;
   box-shadow:
     26px 0 0 -3px rgba(228,201,138,0.7),
     -26px 0 0 -3px rgba(228,201,138,0.7),
     50px 0 0 -4.3px rgba(228,201,138,0.4),
     -50px 0 0 -4.3px rgba(228,201,138,0.4);
+}
+@keyframes ornamentPop {
+  from { opacity: 0; transform: rotate(45deg) scale(0); }
+  to   { opacity: 1; transform: rotate(45deg) scale(1); }
 }
 
 /* ─── 6. TAP BUTTON — ROTATING GOLD RING + PULSE ─── */
@@ -458,6 +480,59 @@
   color: var(--rose-dark);
   line-height: 1;
   margin-bottom: 4px;
+  position: relative;
+}
+
+/* Gold confetti burst — fires from the button's center the instant you
+   tap, using a set of tiny particles at fixed relative offsets that all
+   radiate outward together as the parent scales up and fades (so it reads
+   as a burst without needing per-particle transforms). Transform+opacity
+   only, so it stays smooth even on lower-end phones. */
+.w-letter::before, .w-letter::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #c9a96e;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  z-index: 20;
+}
+.w-letter::before {
+  box-shadow:
+    0 -18px 0 -1px #f6e6c2,
+    13px -13px 0 -1.3px #c9a96e,
+    18px 0 0 -1px #ffffff,
+    13px 13px 0 -1.3px #f6e6c2,
+    0 18px 0 -1px #c9a96e,
+    -13px 13px 0 -1.3px #ffffff,
+    -18px 0 0 -1px #f6e6c2,
+    -13px -13px 0 -1.3px #c9a96e;
+}
+.w-letter::after {
+  box-shadow:
+    7px -25px 0 -1.2px #ffffff,
+    25px -7px 0 -1.2px #c9a96e,
+    25px 7px 0 -1.2px #f6e6c2,
+    7px 25px 0 -1.2px #ffffff,
+    -7px 25px 0 -1.2px #c9a96e,
+    -25px 7px 0 -1.2px #f6e6c2,
+    -25px -7px 0 -1.2px #ffffff,
+    -7px -25px 0 -1.2px #c9a96e;
+}
+#envelope-cover.opening .w-letter::before,
+#envelope-cover.opening .w-letter::after {
+  animation: confettiBurst 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+#envelope-cover.opening .w-letter::after {
+  animation-delay: 0.06s;
+}
+@keyframes confettiBurst {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(9); }
 }
 
 .tap-text-small {
@@ -465,6 +540,26 @@
   letter-spacing: 2px;
   color: var(--rose-dark);
   text-transform: uppercase;
+  position: relative;
+  padding-right: 10px;
+}
+
+/* Tiny pulsing tap-point — a soft ripple dot that reinforces the tap
+   affordance without adding any extra visual clutter */
+.tap-text-small::after {
+  content: '';
+  position: absolute;
+  top: 50%; right: 0;
+  width: 3px; height: 3px;
+  margin-top: -1.5px;
+  border-radius: 50%;
+  background: var(--rose-dark);
+  opacity: 0.6;
+  animation: tapPointPulse 1.8s ease-in-out infinite;
+}
+@keyframes tapPointPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(90,30,50,0.35); }
+  50%      { box-shadow: 0 0 0 5px rgba(90,30,50,0); }
 }
 
 .tap-text {
@@ -529,15 +624,25 @@
 @media (prefers-reduced-motion: reduce) {
   #envelope-cover,
   #envelope-cover::before,
-  #envelope-cover::after,
   .door-left, .door-right,
   .envelope-inner::before, .envelope-inner::after,
   .tap-btn, .tap-btn::before, .tap-btn::after,
   .tap-text::after,
+  .w-letter::before, .w-letter::after,
+  .tap-text-small::after,
   .env-card, .env-card::before, .env-card::after,
-  .env-label,
+  .env-label, .env-label::after,
   #main-content.visible {
     animation: none !important;
+    opacity: 1 !important;
     transition-duration: 0.2s !important;
+  }
+  #envelope-cover::after {
+    animation: none !important;
+    transition-duration: 0.2s !important;
+  }
+  .w-letter::before, .w-letter::after {
+    animation: none !important;
+    opacity: 0 !important;
   }
 }
