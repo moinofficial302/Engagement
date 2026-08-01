@@ -32,15 +32,23 @@
 }
 
 :root {
-  --rose:       #c5768a;
-  --rose-dark:  #a85870;
-  --rose-light: #e8b4be;
-  --blush:      #f5ede8;
-  --cream:      #fdf8f5;
-  --gold:       #c9a96e;
-  --text-dark:  #1c1414;  /* darkened another ~15% from #211717 */
-  --text-mid:   #3a2b2b;  /* darkened another ~15% from #443232 */
-  --text-light: #534545;  /* darkened another ~15% from #625151 */
+  --rose:        #b85f7d;  /* deepened from #c5768a */
+  --rose-dark:   #8f3f5c;  /* deepened from #a85870 */
+  --rose-light:  #dba0b0;  /* deepened from #e8b4be */
+  --blush:       #f2e2e0;  /* deepened from #f5ede8 */
+  --cream:       #faf6f0;  /* warmer ivory, deepened from #fdf8f5 */
+  --gold:        #b8934a;  /* deepened from #c9a96e */
+  --gold-dark:   #96762f;  /* new — for hover states / richer accents */
+  --text-dark:   #1c1414;
+  --text-mid:    #3a2b2b;
+  --text-light:  #534545;
+
+  /* Premium shadow system — tinted with the brand rose instead of flat
+     black, which reads as noticeably more polished. Use these instead
+     of ad-hoc rgba(0,0,0,...) shadows wherever a new one is needed. */
+  --shadow-sm: 0 2px 10px rgba(143,63,92,0.08);
+  --shadow-md: 0 8px 24px rgba(143,63,92,0.14);
+  --shadow-lg: 0 16px 44px rgba(143,63,92,0.20);
 }
 
 /* ─── 1b. PROFESSIONAL POLISH ─── */
@@ -58,6 +66,49 @@ button:focus-visible,
 .form-textarea:focus-visible {
   outline: 2px solid var(--rose);
   outline-offset: 2px;
+}
+
+/* ─── 1c. SCROLL REVEAL ───
+   Sections fade+lift into view as the guest scrolls. Triggered by
+   IntersectionObserver in app.js, which adds .revealed once a
+   .reveal-on-scroll element enters the viewport. */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
+              transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Timeline / Pre-Wedding list items stagger in one after another once
+   their parent section is revealed. app.js sets --stagger-index on
+   each item when it renders the list. */
+.timeline-item, .prewedding-item {
+  opacity: 0;
+}
+.reveal-on-scroll.revealed .timeline-item,
+.reveal-on-scroll.revealed .prewedding-item {
+  animation: staggerIn 0.55s cubic-bezier(0.16,1,0.3,1) forwards;
+  animation-delay: calc(var(--stagger-index, 0) * 90ms);
+}
+@keyframes staggerIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Respect users who've asked for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll,
+  .reveal-on-scroll .timeline-item,
+  .reveal-on-scroll .prewedding-item {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* ─── 2. BASE / BODY ─── */
@@ -90,9 +141,10 @@ body {
   background: linear-gradient(160deg, #0d1f3c 0%, #0a1628 60%, #071020 100%);
 }
 .hero-img {
-  width: 100%; height: 100%;
+  width: 100%; height: 115%;
   object-fit: cover;
   object-position: center;
+  will-change: transform;
 }
 .hero-overlay {
   position: absolute; inset: 0;
@@ -181,7 +233,7 @@ body {
   font-weight: 600;
   font-size: 32px;
   letter-spacing: 0.5px;
-  text-shadow: 0 1px 3px rgba(197,118,138,0.18);
+  text-shadow: 0 1px 3px rgba(184,95,125,0.18);
   color: var(--rose);
   text-align: center;
   margin-bottom: 8px;
@@ -479,11 +531,11 @@ body {
 }
 .count-item {
   background: var(--rose-light);
-  border: 1px solid rgba(197,118,138,0.25);
+  border: 1px solid rgba(184,95,125,0.25);
   border-radius: 12px;
   padding: 14px 4px;
   min-width: 0;
-  box-shadow: 0 4px 15px rgba(197,118,138,0.12);
+  box-shadow: 0 4px 15px rgba(184,95,125,0.12);
 }
 .count-num {
   font-family: 'Cormorant Garamond', serif;
@@ -509,9 +561,10 @@ body {
   background: white;
   border-radius: 16px;
   padding: 28px 24px;
-  box-shadow: 0 4px 20px rgba(197,118,138,0.1);
-  border: 1px solid rgba(197,118,138,0.1);
+  box-shadow: var(--shadow-sm), 0 1px 2px rgba(143,63,92,0.06);
+  border: 1px solid rgba(184,95,125,0.1);
   margin-bottom: 20px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 .card-icon {
   text-align: center;
@@ -524,7 +577,7 @@ body {
   display: flex;
   gap: 16px;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(197,118,138,0.1);
+  border-bottom: 1px solid rgba(184,95,125,0.1);
 }
 .timeline-item:last-child { border-bottom: none; }
 .tl-dot {
@@ -533,7 +586,7 @@ body {
   background: var(--rose);
   flex-shrink: 0;
   margin-top: 6px;
-  box-shadow: 0 0 0 3px rgba(197,118,138,0.2);
+  box-shadow: 0 0 0 3px rgba(184,95,125,0.2);
 }
 .tl-title {
   font-family: 'Cormorant Garamond', serif;
@@ -571,8 +624,8 @@ body {
   border-radius: 14px;
   overflow: hidden;
   margin-bottom: 20px;
-  border: 1px solid rgba(197,118,138,0.2);
-  box-shadow: 0 4px 15px rgba(197,118,138,0.12);
+  border: 1px solid rgba(184,95,125,0.2);
+  box-shadow: 0 4px 15px rgba(184,95,125,0.12);
 }
 .venue-map-embed {
   width: 100%; height: 100%;
@@ -611,19 +664,23 @@ body {
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 1px;
-  box-shadow: 0 4px 15px rgba(197,118,138,0.35);
+  box-shadow: 0 4px 15px rgba(184,95,125,0.35);
   transition: transform 0.2s, box-shadow 0.2s;
+}
+.venue-map-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(184,95,125,0.4);
 }
 .venue-map-btn:active {
   transform: scale(0.97);
-  box-shadow: 0 2px 8px rgba(197,118,138,0.3);
+  box-shadow: 0 2px 8px rgba(184,95,125,0.3);
 }
 
 /* ─── 17. PRE-WEDDING EVENTS ─── */
 .prewedding-item {
   text-align: center;
   padding: 16px 0;
-  border-bottom: 1px solid rgba(197,118,138,0.1);
+  border-bottom: 1px solid rgba(184,95,125,0.1);
 }
 .prewedding-item:last-child { border-bottom: none; }
 .pw-name {
@@ -656,7 +713,7 @@ body {
 .form-textarea {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid rgba(197,118,138,0.25);
+  border: 1px solid rgba(184,95,125,0.25);
   border-radius: 10px;
   font-family: 'Montserrat', sans-serif;
   font-size: 14px;
@@ -670,7 +727,7 @@ body {
 .form-select:focus,
 .form-textarea:focus {
   border-color: var(--rose);
-  box-shadow: 0 0 0 3px rgba(197,118,138,0.1);
+  box-shadow: 0 0 0 3px rgba(184,95,125,0.1);
 }
 .form-input::placeholder,
 .form-textarea::placeholder {
@@ -691,13 +748,17 @@ body {
   font-weight: 500;
   letter-spacing: 1px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(197,118,138,0.35);
+  box-shadow: 0 4px 15px rgba(184,95,125,0.35);
   transition: transform 0.2s, box-shadow 0.2s;
   margin-top: 4px;
 }
+.send-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(184,95,125,0.4);
+}
 .send-btn:active {
   transform: scale(0.98);
-  box-shadow: 0 2px 8px rgba(197,118,138,0.3);
+  box-shadow: 0 2px 8px rgba(184,95,125,0.3);
 }
 .send-btn:disabled {
   opacity: 0.6;
@@ -728,7 +789,7 @@ body {
   font-weight: 600;
   font-size: 26px;
   letter-spacing: 0.5px;
-  text-shadow: 0 1px 3px rgba(197,118,138,0.15);
+  text-shadow: 0 1px 3px rgba(184,95,125,0.15);
   color: var(--rose);
   line-height: 1.4;
   margin-bottom: 16px;
@@ -751,7 +812,7 @@ body {
   background: var(--blush);
   padding: 16px 24px;
   text-align: center;
-  border-top: 1px solid rgba(197,118,138,0.15);
+  border-top: 1px solid rgba(184,95,125,0.15);
 }
 .creator-bar p {
   font-size: 12px;
