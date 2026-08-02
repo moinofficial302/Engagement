@@ -8,13 +8,15 @@
    file only — keep style.css free of door-screen code.
 
    Sections:
-   1. Envelope Cover (background + ambient shift + pattern + glow burst)
-   2. Floating Sparkle Field
-   3. Door Panels (the two swinging halves + shimmer sweep)
-   4. Door Open Animation (rotateY, with settle/bounce)
-   5. Center Content (tap-to-open circle, labels + entrance animation)
-   6. Pulse Animation (glow ring on the tap button)
-   7. Main Content Reveal (fade in once doors open)
+   1. Envelope Cover (radial spotlight background + ambient shift)
+   2. Vertical Light Beam
+   3. Golden Dust Field (fine sparkle + soft bokeh orbs)
+   4. Corner Frame + Star Accent
+   5. Door Panels (seamless split gradient + shimmer sweep)
+   6. Door Open Animation (rotateY, with settle)
+   7. Center Content (tap-to-open circle + concentric rings + labels)
+   8. Pulse Animation (glow ring on the tap button)
+   9. Main Content Reveal (fade in once doors open)
 ═══════════════════════════════════════════════════ */
 
 /* ─── 1. ENVELOPE COVER ─── */
@@ -22,19 +24,17 @@
   position: fixed; inset: 0;
   z-index: 1000;
   overflow: hidden;
-  background: linear-gradient(160deg, #5c2840 0%, #8f3f5c 55%, #b85f7d 100%);
-  background-size: 180% 180%;
+  background: radial-gradient(ellipse 140% 85% at 50% 32%,
+    #c98aa0 0%, #9c5570 32%, #6b3349 62%, #3d1f2d 100%);
+  background-size: 130% 130%;
   perspective: 1400px;
   perspective-origin: 50% 50%;
   cursor: pointer;
   animation: ambientShift 9s ease-in-out infinite;
 }
-
-/* Very slow background drift — a "living" screen instead of a flat
-   static image, while the guest decides to tap */
 @keyframes ambientShift {
-  0%, 100% { background-position: 0% 0%; }
-  50%      { background-position: 100% 60%; }
+  0%, 100% { background-position: 50% 40%; }
+  50%      { background-position: 50% 55%; }
 }
 
 /* Subtle diagonal pattern background */
@@ -42,14 +42,13 @@
   content: '';
   position: absolute; inset: 0;
   background-image:
-    linear-gradient(45deg,  rgba(255,255,255,0.07) 1px, transparent 1px),
-    linear-gradient(-45deg, rgba(255,255,255,0.07) 1px, transparent 1px);
+    linear-gradient(45deg,  rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(255,255,255,0.06) 1px, transparent 1px);
   background-size: 40px 40px;
   z-index: 0;
 }
 
-/* Glow Burst — blooms outward from the center as the doors part,
-   gold-tinted at the core for a warmer, richer flash than plain white */
+/* Glow Burst — blooms outward from the center as the doors part */
 #envelope-cover::after {
   content: '';
   position: absolute; top: 50%; left: 50%;
@@ -68,26 +67,83 @@
   opacity: 1;
 }
 
-/* ─── 2. FLOATING SPARKLE FIELD ───
-   A quiet field of gold/white dust drifting and twinkling behind the
-   tap button — pure CSS, no extra markup needed. */
+/* ─── 2. VERTICAL LIGHT BEAM ───
+   A soft column of golden light falling from the top of the screen
+   straight through the tap button, like a single ray of light. */
+.light-beam {
+  position: absolute;
+  top: 0; bottom: 0; left: 50%;
+  width: 130px;
+  transform: translateX(-50%);
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    rgba(255,235,190,0.30) 12%,
+    rgba(255,245,220,0.48) 50%,
+    rgba(255,235,190,0.30) 88%,
+    transparent 100%);
+  filter: blur(20px);
+  opacity: 0.8;
+  animation: beamPulse 4s ease-in-out infinite;
+  transition: opacity 0.2s;
+}
+/* Bright, sharp core running down the middle of the soft beam */
+.light-beam::after {
+  content: '';
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  width: 2.5px;
+  transform: translateX(-50%);
+  background: linear-gradient(to bottom,
+    transparent, rgba(255,250,235,0.95) 18%, rgba(255,250,235,0.95) 82%, transparent);
+  box-shadow: 0 0 22px 5px rgba(255,235,190,0.55);
+}
+@keyframes beamPulse {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+#envelope-cover.opening .light-beam { opacity: 0; }
+
+/* ─── 3. GOLDEN DUST FIELD ───
+   Fine twinkling particles plus a few larger soft bokeh orbs —
+   pure CSS, layered radial-gradients, no extra markup needed. */
 .envelope-inner::before {
   content: '';
   position: absolute; inset: -60px;
   background-image:
-    radial-gradient(1.5px 1.5px at 12% 22%, rgba(255,235,180,0.8), transparent),
-    radial-gradient(1px 1px at 28% 68%, rgba(255,255,255,0.6), transparent),
-    radial-gradient(2px 2px at 48% 12%, rgba(255,235,180,0.7), transparent),
-    radial-gradient(1px 1px at 68% 42%, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1.5px 1.5px at 82% 78%, rgba(255,235,180,0.65), transparent),
-    radial-gradient(1px 1px at 20% 85%, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1.5px 1.5px at 62% 90%, rgba(255,235,180,0.6), transparent),
-    radial-gradient(1px 1px at 40% 38%, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1.5px 1.5px at 90% 30%, rgba(255,235,180,0.6), transparent),
-    radial-gradient(1px 1px at 8% 55%, rgba(255,255,255,0.45), transparent);
+    radial-gradient(1.6px 1.6px at 10% 18%, rgba(255,235,180,0.85), transparent),
+    radial-gradient(1.2px 1.2px at 22% 62%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(2px 2px at 42% 10%, rgba(255,235,180,0.8), transparent),
+    radial-gradient(1.2px 1.2px at 65% 38%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.8px 1.8px at 80% 72%, rgba(255,235,180,0.75), transparent),
+    radial-gradient(1.2px 1.2px at 16% 82%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.8px 1.8px at 58% 88%, rgba(255,235,180,0.7), transparent),
+    radial-gradient(1.2px 1.2px at 36% 34%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 90% 26%, rgba(255,235,180,0.75), transparent),
+    radial-gradient(1.2px 1.2px at 6% 50%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1.6px 1.6px at 94% 55%, rgba(255,235,180,0.7), transparent),
+    radial-gradient(1.2px 1.2px at 50% 68%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1.6px 1.6px at 30% 92%, rgba(255,235,180,0.65), transparent),
+    radial-gradient(1.2px 1.2px at 74% 8%, rgba(255,255,255,0.55), transparent);
   z-index: 5;
   pointer-events: none;
   animation: sparkleFloat 14s ease-in-out infinite, sparkleTwinkle 3.2s ease-in-out infinite;
+  transition: opacity 0.2s;
+}
+/* A handful of larger, softly blurred orbs for depth (bokeh) */
+.envelope-inner::after {
+  content: '';
+  position: absolute; inset: -90px;
+  background-image:
+    radial-gradient(18px 18px at 14% 76%, rgba(255,235,190,0.16), transparent),
+    radial-gradient(12px 12px at 90% 22%, rgba(255,255,255,0.13), transparent),
+    radial-gradient(24px 24px at 82% 84%, rgba(255,235,190,0.13), transparent),
+    radial-gradient(10px 10px at 6% 30%, rgba(255,255,255,0.12), transparent);
+  filter: blur(3px);
+  z-index: 5;
+  pointer-events: none;
+  animation: sparkleFloat 18s ease-in-out infinite reverse;
+  transition: opacity 0.2s;
 }
 @keyframes sparkleFloat {
   0%, 100% { transform: translateY(0); }
@@ -97,40 +153,93 @@
   0%, 100% { opacity: 0.55; }
   50%      { opacity: 1; }
 }
+#envelope-cover.opening .envelope-inner::before,
+#envelope-cover.opening .envelope-inner::after { opacity: 0; }
 
-/* ─── 3. DOOR PANELS ─── */
+/* ─── 4. CORNER FRAME + STAR ACCENT ───
+   Thin gold bracket corners, like a picture-frame edge, plus a
+   single small sparkle star for a finished, cinematic feel. */
+.corner-frame {
+  position: absolute;
+  width: 70px; height: 70px;
+  z-index: 3;
+  opacity: 0.65;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.corner-frame-tl {
+  top: 26px; left: 22px;
+  border-top: 1.5px solid rgba(240,205,150,0.7);
+  border-left: 1.5px solid rgba(240,205,150,0.7);
+}
+.corner-frame-br {
+  bottom: 26px; right: 22px;
+  border-bottom: 1.5px solid rgba(240,205,150,0.7);
+  border-right: 1.5px solid rgba(240,205,150,0.7);
+}
+#envelope-cover.opening .corner-frame { opacity: 0; }
+
+.star-accent {
+  position: absolute;
+  bottom: 14%; left: 12%;
+  width: 10px; height: 10px;
+  z-index: 5;
+  pointer-events: none;
+  background: rgba(255,245,220,0.95);
+  clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+  filter: drop-shadow(0 0 6px rgba(255,235,190,0.8));
+  animation: starTwinkle 2.6s ease-in-out infinite;
+  transition: opacity 0.2s;
+}
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8) rotate(0deg); }
+  50%      { opacity: 1;   transform: scale(1.15) rotate(20deg); }
+}
+#envelope-cover.opening .star-accent { opacity: 0; }
+
+/* ─── 5. DOOR PANELS ───
+   Each panel shows one half of the SAME spotlight gradient (via
+   background-size/-position math) so the two halves line up into
+   one seamless image when the doors are closed. */
 .door-left, .door-right {
   position: absolute; top: 0; bottom: 0;
   width: 50%;
-  background:
+  background-image:
     linear-gradient(100deg, transparent 42%, rgba(255,223,150,0.14) 49%, rgba(255,223,150,0.14) 53%, transparent 60%),
-    linear-gradient(160deg, #5c2840 0%, #8f3f5c 55%, #b85f7d 100%);
-  background-size: 260% 100%, 100% 100%;
-  background-position: 130% 0, 0 0;
+    radial-gradient(ellipse 140% 85% at 50% 32%, #c98aa0 0%, #9c5570 32%, #6b3349 62%, #3d1f2d 100%);
+  background-size: 260% 100%, 200% 100%;
   z-index: 2;
   will-change: transform, background-position;
   backface-visibility: hidden;
   overflow: hidden;
-  animation: doorShimmer 6s ease-in-out infinite;
 }
 .door-left {
   left: 0;
   transform-origin: left center;
   box-shadow: inset -3px 0 12px rgba(255,255,255,0.15);
+  animation: doorShimmerLeft 6s ease-in-out infinite;
 }
 .door-right {
   right: 0;
   transform-origin: right center;
   box-shadow: inset 3px 0 12px rgba(255,255,255,0.15);
+  animation: doorShimmerRight 6s ease-in-out infinite;
   animation-delay: 1.2s; /* offset so both panels don't shimmer in lockstep */
 }
 
-/* Slow gold light sweep across each closed door panel — a quiet
-   "foil catching the light" touch while the guest hasn't tapped yet */
-@keyframes doorShimmer {
-  0%   { background-position: 140% 0, 0 0; }
-  55%  { background-position: -40% 0, 0 0; }
-  100% { background-position: -40% 0, 0 0; }
+/* Slow gold light sweep across each closed door panel. The 2nd
+   background-position value (the base gradient) stays fixed at each
+   side's half so the seam always lines up; only the shimmer (1st
+   value) moves. */
+@keyframes doorShimmerLeft {
+  0%   { background-position: 140% 0, 0% 0%; }
+  55%  { background-position: -40% 0, 0% 0%; }
+  100% { background-position: -40% 0, 0% 0%; }
+}
+@keyframes doorShimmerRight {
+  0%   { background-position: 140% 0, 100% 0%; }
+  55%  { background-position: -40% 0, 100% 0%; }
+  100% { background-position: -40% 0, 100% 0%; }
 }
 
 /* Subtle pattern repeated on each door panel */
@@ -159,7 +268,7 @@
 
 .door-center-line { display: none; }
 
-/* ─── 4. DOOR OPEN ANIMATION (rotateY, with settle) ───
+/* ─── 6. DOOR OPEN ANIMATION (rotateY, with settle) ───
    A slight overshoot-then-settle on the swing reads as more physical
    than snapping straight to the final angle. */
 #envelope-cover.opening .door-left {
@@ -186,7 +295,7 @@
 }
 #envelope-cover.opening { pointer-events: none; }
 
-/* ─── 5. CENTER CONTENT (tap-to-open circle + labels) ─── */
+/* ─── 7. CENTER CONTENT (tap-to-open circle + labels) ─── */
 .envelope-inner {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
@@ -212,12 +321,23 @@
   color: white;
   letter-spacing: 4px;
   text-transform: uppercase;
-  margin-bottom: 36px;
+  margin-bottom: 22px;
   display: block;
   animation: envFadeDown 0.9s ease 0.2s both;
 }
+/* Small diamond sparkle between the label and the circle button */
+.env-label::after {
+  content: '';
+  display: block;
+  width: 7px; height: 7px;
+  margin: 14px auto 0;
+  background: linear-gradient(135deg, #fff3d6, #d4af6a);
+  transform: rotate(45deg);
+  box-shadow: 0 0 10px 2px rgba(255,223,150,0.6);
+}
 
 .tap-btn {
+  position: relative;
   width: 110px; height: 110px;
   background: linear-gradient(145deg, #ffffff, #fdf1f4);
   border-radius: 50%;
@@ -233,6 +353,26 @@
   animation:
     pulse 2.5s ease-in-out infinite,
     envFadeScale 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both;
+}
+/* Concentric decorative rings around the button, like the reference */
+.tap-btn::before {
+  content: '';
+  position: absolute; inset: -16px;
+  border: 1px solid rgba(240,205,150,0.55);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.tap-btn::after {
+  content: '';
+  position: absolute; inset: -30px;
+  border: 1px dashed rgba(240,205,150,0.35);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ringRotate 40s linear infinite;
+}
+@keyframes ringRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .w-letter {
@@ -276,7 +416,7 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── 6. PULSE ANIMATION (glow ring on tap button) ─── */
+/* ─── 8. PULSE ANIMATION (glow ring on tap button) ─── */
 @keyframes pulse {
   0%, 100% {
     box-shadow:
@@ -292,7 +432,7 @@
   }
 }
 
-/* ─── 7. MAIN CONTENT REVEAL (arriving at the card page) ─── */
+/* ─── 9. MAIN CONTENT REVEAL (arriving at the card page) ─── */
 #main-content {
   display: none;
   opacity: 0;
@@ -311,7 +451,8 @@
 @media (prefers-reduced-motion: reduce) {
   #envelope-cover,
   .door-left, .door-right,
-  .envelope-inner::before,
+  .light-beam, .envelope-inner::before, .envelope-inner::after,
+  .star-accent, .tap-btn::after,
   .env-label, .tap-btn, .tap-text {
     animation: none !important;
   }
