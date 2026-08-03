@@ -11,7 +11,7 @@
 
 'use strict';
 
-const CACHE_NAME    = 'wedding-v1.2.2';
+const CACHE_NAME    = 'wedding-v1.2.3';
 const OFFLINE_PAGE  = 'offline.html';
 
 /* ── Files to pre-cache on install ──
