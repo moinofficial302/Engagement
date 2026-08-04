@@ -411,6 +411,7 @@ let slideshowInterval = null;
 function startSlideshow() {
   if (slideshowInterval) return;
 
+  const container = document.getElementById('slideshow');
   const slides = document.querySelectorAll('.slide');
   const dots   = document.querySelectorAll('.slide-dot');
   if (!slides.length) return;
@@ -418,25 +419,50 @@ function startSlideshow() {
   let current = 0;
 
   function goTo(index) {
+    const next = (index + slides.length) % slides.length; // wrap both directions
     slides[current].classList.remove('active');
     dots[current]?.classList.remove('active');
-    current = index;
+    current = next;
     slides[current].classList.add('active');
     dots[current]?.classList.add('active');
   }
 
-  slideshowInterval = setInterval(() => {
-    goTo((current + 1) % slides.length);
-  }, 4000);
+  function restartAutoRotate() {
+    clearInterval(slideshowInterval);
+    slideshowInterval = setInterval(() => goTo(current + 1), 4000);
+  }
+
+  restartAutoRotate();
 
   dots.forEach((dot, i) => {
     dot.style.cursor = 'pointer';
     dot.addEventListener('click', () => {
-      clearInterval(slideshowInterval);
       goTo(i);
-      slideshowInterval = setInterval(() => goTo((current + 1) % slides.length), 4000);
+      restartAutoRotate();
     });
   });
+
+  // Finger-swipe support — swipe left for next, right for previous
+  if (container) {
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    container.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    container.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+
+      // Ignore mostly-vertical swipes (those are page scrolls, not slide changes)
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+
+      goTo(dx < 0 ? current + 1 : current - 1);
+      restartAutoRotate();
+    }, { passive: true });
+  }
 }
 
 /* ═══════════════════════════════
