@@ -334,7 +334,7 @@
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
   font-weight: 500;
-  font-size: 15px;
+  font-size: 16px;
   color: white;
   letter-spacing: 4px;
   text-transform: uppercase;
@@ -406,7 +406,7 @@
 
 .w-letter {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 32px;
+  font-size: 34px;
   font-weight: 600;
   color: var(--rose-dark);
   line-height: 1;
@@ -414,14 +414,14 @@
 }
 
 .tap-text-small {
-  font-size: 8px;
+  font-size: 9px;
   letter-spacing: 2px;
   color: var(--rose-dark);
   text-transform: uppercase;
 }
 
 .tap-text {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 3px;
   color: white;
   text-transform: uppercase;
